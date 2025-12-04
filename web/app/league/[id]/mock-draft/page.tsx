@@ -102,7 +102,9 @@ export default function MockDraftPage() {
                 }
 
                 // Fetch REAL Polymarket markets from dedicated API
-                const marketsRes = await fetch('/api/polymarket/markets?limit=30&min_liquidity=100');
+                // Filter by league category if specified
+                const categoryParam = leagueInfo.category ? `&category=${encodeURIComponent(leagueInfo.category)}` : '';
+                const marketsRes = await fetch(`/api/polymarket/markets?limit=30&min_liquidity=100${categoryParam}`);
                 if (marketsRes.ok) {
                     const marketsData = await marketsRes.json();
                     const marketsList = marketsData.markets || [];
@@ -283,8 +285,8 @@ export default function MockDraftPage() {
                             <button
                                 onClick={() => setDraftMode('auto')}
                                 className={`px-3 py-1 rounded text-sm transition ${draftMode === 'auto'
-                                        ? 'bg-blue-600 text-white'
-                                        : 'text-gray-400 hover:text-white'
+                                    ? 'bg-blue-600 text-white'
+                                    : 'text-gray-400 hover:text-white'
                                     }`}
                             >
                                 Auto Order
@@ -292,8 +294,8 @@ export default function MockDraftPage() {
                             <button
                                 onClick={() => setDraftMode('manual')}
                                 className={`px-3 py-1 rounded text-sm transition ${draftMode === 'manual'
-                                        ? 'bg-purple-600 text-white'
-                                        : 'text-gray-400 hover:text-white'
+                                    ? 'bg-purple-600 text-white'
+                                    : 'text-gray-400 hover:text-white'
                                     }`}
                             >
                                 Manual Pick
@@ -372,12 +374,12 @@ export default function MockDraftPage() {
                                                     }
                                                 }}
                                                 className={`p-3 rounded-lg transition cursor-pointer ${isSelected
-                                                        ? 'bg-purple-600 ring-2 ring-purple-400'
-                                                        : isCurrentDrafter && draftMode === 'auto'
-                                                            ? 'bg-blue-600 ring-2 ring-blue-400'
-                                                            : isMaxed
-                                                                ? 'bg-gray-700/50 opacity-50'
-                                                                : 'bg-gray-700 hover:bg-gray-600'
+                                                    ? 'bg-purple-600 ring-2 ring-purple-400'
+                                                    : isCurrentDrafter && draftMode === 'auto'
+                                                        ? 'bg-blue-600 ring-2 ring-blue-400'
+                                                        : isMaxed
+                                                            ? 'bg-gray-700/50 opacity-50'
+                                                            : 'bg-gray-700 hover:bg-gray-600'
                                                     }`}
                                             >
                                                 <div className="flex justify-between items-center">
@@ -510,8 +512,8 @@ export default function MockDraftPage() {
                                                             handleDraftPick(market, 'YES');
                                                         }}
                                                         className={`flex-1 px-3 py-2 rounded text-sm font-bold transition ${yesDisabled || isDraftComplete || draftOrder.length === 0 || noPlayerSelected
-                                                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                                                : 'bg-green-600 hover:bg-green-500'
+                                                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                                            : 'bg-green-600 hover:bg-green-500'
                                                             }`}
                                                     >
                                                         {yesDisabled ? '✓ YES Drafted' : `Draft YES @ ${formatCents(market.current_price_yes)}`}
@@ -523,8 +525,8 @@ export default function MockDraftPage() {
                                                             handleDraftPick(market, 'NO');
                                                         }}
                                                         className={`flex-1 px-3 py-2 rounded text-sm font-bold transition ${noDisabled || isDraftComplete || draftOrder.length === 0 || noPlayerSelected
-                                                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                                                : 'bg-red-600 hover:bg-red-500'
+                                                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                                            : 'bg-red-600 hover:bg-red-500'
                                                             }`}
                                                     >
                                                         {noDisabled ? '✓ NO Drafted' : `Draft NO @ ${formatCents(market.current_price_no)}`}

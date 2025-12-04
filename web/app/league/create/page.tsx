@@ -1,9 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWallet } from '@solana/wallet-adapter-react';
 import Link from 'next/link';
+
+const CATEGORIES = [
+    'All Categories',
+    'Sports',
+    'Politics',
+    'Crypto',
+    'Pop Culture',
+    'Business',
+    'Science',
+];
 
 export default function CreateLeague() {
     const router = useRouter();
@@ -15,7 +25,8 @@ export default function CreateLeague() {
         currency: 'SOL',
         maxPlayers: '8',
         totalSessions: '8',
-        marketsPerSession: '5'
+        marketsPerSession: '5',
+        category: 'All Categories'
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -42,6 +53,8 @@ export default function CreateLeague() {
                     currency: formData.currency,
                     maxPlayers: formData.maxPlayers,
                     totalSessions: formData.totalSessions,
+                    marketsPerSession: formData.marketsPerSession,
+                    category: formData.category === 'All Categories' ? null : formData.category,
                 })
             });
 
@@ -81,6 +94,22 @@ export default function CreateLeague() {
                         />
                     </div>
 
+                    <div>
+                        <label className="block text-sm font-medium mb-2">Market Category</label>
+                        <select
+                            value={formData.category}
+                            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                            className="w-full px-4 py-2 border rounded-md bg-background"
+                        >
+                            {CATEGORIES.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </select>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            Restrict draft markets to a specific category (or allow all categories)
+                        </p>
+                    </div>
+
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium mb-2">Buy-in Amount</label>
@@ -107,10 +136,10 @@ export default function CreateLeague() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-2">Max Players (8-12)</label>
+                        <label className="block text-sm font-medium mb-2">Max Players (2-12)</label>
                         <input
                             type="number"
-                            min="8"
+                            min="2"
                             max="12"
                             required
                             value={formData.maxPlayers}
