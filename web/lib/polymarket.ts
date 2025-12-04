@@ -38,21 +38,11 @@ export async function getMarkets(params: MarketFilterParams = {}): Promise<Gamma
   const url = new URL(`${BASE_URL}/markets`);
 
   // Default params
-  const queryParams: Record<string, string> = {
-    limit: String(params.limit || 50),
-    offset: String(params.offset || 0),
-    active: String(params.active ?? true),
-    closed: String(params.closed ?? false),
-  };
+  if (!params.limit) params.limit = 50;
+  if (!params.active) params.active = true;
+  if (!params.closed) params.closed = false;
 
-  if (params.category) queryParams.category = params.category;
-  if (params.order) queryParams.order = params.order;
-  if (params.ascending !== undefined) queryParams.ascending = String(params.ascending);
-  // Note: Gamma API might not support min_liquidity directly in query, we might need to filter client side
-  // But let's check if we can pass it. If not, we filter after fetch.
-  // We'll assume we filter client side for complex filters not supported by API.
-
-  Object.keys(queryParams).forEach(key => url.searchParams.append(key, queryParams[key]));
+  Object.keys(params).forEach(key => url.searchParams.append(key, String(params[key])));
 
   try {
     const res = await fetch(url.toString());
