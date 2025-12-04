@@ -28,74 +28,166 @@ export type AggregateMarket = {
 
 export type MarketAvgAggregateOutputType = {
   p0: number | null
+  currentPriceYes: number | null
+  currentPriceNo: number | null
+  liquidity: number | null
+  volume: number | null
+  tickSize: runtime.Decimal | null
 }
 
 export type MarketSumAggregateOutputType = {
   p0: number | null
+  currentPriceYes: number | null
+  currentPriceNo: number | null
+  liquidity: number | null
+  volume: number | null
+  tickSize: runtime.Decimal | null
 }
 
 export type MarketMinAggregateOutputType = {
   id: string | null
   title: string | null
+  description: string | null
   category: string | null
   p0: number | null
   resolution: string | null
   resolvedAt: Date | null
+  endDate: Date | null
+  currentPriceYes: number | null
+  currentPriceNo: number | null
+  liquidity: number | null
+  volume: number | null
+  tokenIdYes: string | null
+  tokenIdNo: string | null
+  tickSize: runtime.Decimal | null
+  negRisk: boolean | null
+  active: boolean | null
+  polymarketUrl: string | null
 }
 
 export type MarketMaxAggregateOutputType = {
   id: string | null
   title: string | null
+  description: string | null
   category: string | null
   p0: number | null
   resolution: string | null
   resolvedAt: Date | null
+  endDate: Date | null
+  currentPriceYes: number | null
+  currentPriceNo: number | null
+  liquidity: number | null
+  volume: number | null
+  tokenIdYes: string | null
+  tokenIdNo: string | null
+  tickSize: runtime.Decimal | null
+  negRisk: boolean | null
+  active: boolean | null
+  polymarketUrl: string | null
 }
 
 export type MarketCountAggregateOutputType = {
   id: number
   title: number
+  description: number
   category: number
   p0: number
   resolution: number
   resolvedAt: number
+  endDate: number
+  currentPriceYes: number
+  currentPriceNo: number
+  liquidity: number
+  volume: number
+  tokenIdYes: number
+  tokenIdNo: number
+  tickSize: number
+  negRisk: number
+  active: number
+  polymarketUrl: number
   _all: number
 }
 
 
 export type MarketAvgAggregateInputType = {
   p0?: true
+  currentPriceYes?: true
+  currentPriceNo?: true
+  liquidity?: true
+  volume?: true
+  tickSize?: true
 }
 
 export type MarketSumAggregateInputType = {
   p0?: true
+  currentPriceYes?: true
+  currentPriceNo?: true
+  liquidity?: true
+  volume?: true
+  tickSize?: true
 }
 
 export type MarketMinAggregateInputType = {
   id?: true
   title?: true
+  description?: true
   category?: true
   p0?: true
   resolution?: true
   resolvedAt?: true
+  endDate?: true
+  currentPriceYes?: true
+  currentPriceNo?: true
+  liquidity?: true
+  volume?: true
+  tokenIdYes?: true
+  tokenIdNo?: true
+  tickSize?: true
+  negRisk?: true
+  active?: true
+  polymarketUrl?: true
 }
 
 export type MarketMaxAggregateInputType = {
   id?: true
   title?: true
+  description?: true
   category?: true
   p0?: true
   resolution?: true
   resolvedAt?: true
+  endDate?: true
+  currentPriceYes?: true
+  currentPriceNo?: true
+  liquidity?: true
+  volume?: true
+  tokenIdYes?: true
+  tokenIdNo?: true
+  tickSize?: true
+  negRisk?: true
+  active?: true
+  polymarketUrl?: true
 }
 
 export type MarketCountAggregateInputType = {
   id?: true
   title?: true
+  description?: true
   category?: true
   p0?: true
   resolution?: true
   resolvedAt?: true
+  endDate?: true
+  currentPriceYes?: true
+  currentPriceNo?: true
+  liquidity?: true
+  volume?: true
+  tokenIdYes?: true
+  tokenIdNo?: true
+  tickSize?: true
+  negRisk?: true
+  active?: true
+  polymarketUrl?: true
   _all?: true
 }
 
@@ -188,10 +280,22 @@ export type MarketGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 export type MarketGroupByOutputType = {
   id: string
   title: string
+  description: string | null
   category: string
-  p0: number
+  p0: number | null
   resolution: string | null
   resolvedAt: Date | null
+  endDate: Date
+  currentPriceYes: number | null
+  currentPriceNo: number | null
+  liquidity: number | null
+  volume: number | null
+  tokenIdYes: string | null
+  tokenIdNo: string | null
+  tickSize: runtime.Decimal | null
+  negRisk: boolean
+  active: boolean
+  polymarketUrl: string | null
   _count: MarketCountAggregateOutputType | null
   _avg: MarketAvgAggregateOutputType | null
   _sum: MarketSumAggregateOutputType | null
@@ -220,20 +324,44 @@ export type MarketWhereInput = {
   NOT?: Prisma.MarketWhereInput | Prisma.MarketWhereInput[]
   id?: Prisma.StringFilter<"Market"> | string
   title?: Prisma.StringFilter<"Market"> | string
+  description?: Prisma.StringNullableFilter<"Market"> | string | null
   category?: Prisma.StringFilter<"Market"> | string
-  p0?: Prisma.FloatFilter<"Market"> | number
+  p0?: Prisma.FloatNullableFilter<"Market"> | number | null
   resolution?: Prisma.StringNullableFilter<"Market"> | string | null
   resolvedAt?: Prisma.DateTimeNullableFilter<"Market"> | Date | string | null
+  endDate?: Prisma.DateTimeFilter<"Market"> | Date | string
+  currentPriceYes?: Prisma.FloatNullableFilter<"Market"> | number | null
+  currentPriceNo?: Prisma.FloatNullableFilter<"Market"> | number | null
+  liquidity?: Prisma.FloatNullableFilter<"Market"> | number | null
+  volume?: Prisma.FloatNullableFilter<"Market"> | number | null
+  tokenIdYes?: Prisma.StringNullableFilter<"Market"> | string | null
+  tokenIdNo?: Prisma.StringNullableFilter<"Market"> | string | null
+  tickSize?: Prisma.DecimalNullableFilter<"Market"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  negRisk?: Prisma.BoolFilter<"Market"> | boolean
+  active?: Prisma.BoolFilter<"Market"> | boolean
+  polymarketUrl?: Prisma.StringNullableFilter<"Market"> | string | null
   draftPicks?: Prisma.DraftPickListRelationFilter
 }
 
 export type MarketOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
-  p0?: Prisma.SortOrder
+  p0?: Prisma.SortOrderInput | Prisma.SortOrder
   resolution?: Prisma.SortOrderInput | Prisma.SortOrder
   resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  endDate?: Prisma.SortOrder
+  currentPriceYes?: Prisma.SortOrderInput | Prisma.SortOrder
+  currentPriceNo?: Prisma.SortOrderInput | Prisma.SortOrder
+  liquidity?: Prisma.SortOrderInput | Prisma.SortOrder
+  volume?: Prisma.SortOrderInput | Prisma.SortOrder
+  tokenIdYes?: Prisma.SortOrderInput | Prisma.SortOrder
+  tokenIdNo?: Prisma.SortOrderInput | Prisma.SortOrder
+  tickSize?: Prisma.SortOrderInput | Prisma.SortOrder
+  negRisk?: Prisma.SortOrder
+  active?: Prisma.SortOrder
+  polymarketUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   draftPicks?: Prisma.DraftPickOrderByRelationAggregateInput
 }
 
@@ -243,20 +371,44 @@ export type MarketWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.MarketWhereInput[]
   NOT?: Prisma.MarketWhereInput | Prisma.MarketWhereInput[]
   title?: Prisma.StringFilter<"Market"> | string
+  description?: Prisma.StringNullableFilter<"Market"> | string | null
   category?: Prisma.StringFilter<"Market"> | string
-  p0?: Prisma.FloatFilter<"Market"> | number
+  p0?: Prisma.FloatNullableFilter<"Market"> | number | null
   resolution?: Prisma.StringNullableFilter<"Market"> | string | null
   resolvedAt?: Prisma.DateTimeNullableFilter<"Market"> | Date | string | null
+  endDate?: Prisma.DateTimeFilter<"Market"> | Date | string
+  currentPriceYes?: Prisma.FloatNullableFilter<"Market"> | number | null
+  currentPriceNo?: Prisma.FloatNullableFilter<"Market"> | number | null
+  liquidity?: Prisma.FloatNullableFilter<"Market"> | number | null
+  volume?: Prisma.FloatNullableFilter<"Market"> | number | null
+  tokenIdYes?: Prisma.StringNullableFilter<"Market"> | string | null
+  tokenIdNo?: Prisma.StringNullableFilter<"Market"> | string | null
+  tickSize?: Prisma.DecimalNullableFilter<"Market"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  negRisk?: Prisma.BoolFilter<"Market"> | boolean
+  active?: Prisma.BoolFilter<"Market"> | boolean
+  polymarketUrl?: Prisma.StringNullableFilter<"Market"> | string | null
   draftPicks?: Prisma.DraftPickListRelationFilter
 }, "id">
 
 export type MarketOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
-  p0?: Prisma.SortOrder
+  p0?: Prisma.SortOrderInput | Prisma.SortOrder
   resolution?: Prisma.SortOrderInput | Prisma.SortOrder
   resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  endDate?: Prisma.SortOrder
+  currentPriceYes?: Prisma.SortOrderInput | Prisma.SortOrder
+  currentPriceNo?: Prisma.SortOrderInput | Prisma.SortOrder
+  liquidity?: Prisma.SortOrderInput | Prisma.SortOrder
+  volume?: Prisma.SortOrderInput | Prisma.SortOrder
+  tokenIdYes?: Prisma.SortOrderInput | Prisma.SortOrder
+  tokenIdNo?: Prisma.SortOrderInput | Prisma.SortOrder
+  tickSize?: Prisma.SortOrderInput | Prisma.SortOrder
+  negRisk?: Prisma.SortOrder
+  active?: Prisma.SortOrder
+  polymarketUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.MarketCountOrderByAggregateInput
   _avg?: Prisma.MarketAvgOrderByAggregateInput
   _max?: Prisma.MarketMaxOrderByAggregateInput
@@ -270,112 +422,254 @@ export type MarketScalarWhereWithAggregatesInput = {
   NOT?: Prisma.MarketScalarWhereWithAggregatesInput | Prisma.MarketScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Market"> | string
   title?: Prisma.StringWithAggregatesFilter<"Market"> | string
+  description?: Prisma.StringNullableWithAggregatesFilter<"Market"> | string | null
   category?: Prisma.StringWithAggregatesFilter<"Market"> | string
-  p0?: Prisma.FloatWithAggregatesFilter<"Market"> | number
+  p0?: Prisma.FloatNullableWithAggregatesFilter<"Market"> | number | null
   resolution?: Prisma.StringNullableWithAggregatesFilter<"Market"> | string | null
   resolvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Market"> | Date | string | null
+  endDate?: Prisma.DateTimeWithAggregatesFilter<"Market"> | Date | string
+  currentPriceYes?: Prisma.FloatNullableWithAggregatesFilter<"Market"> | number | null
+  currentPriceNo?: Prisma.FloatNullableWithAggregatesFilter<"Market"> | number | null
+  liquidity?: Prisma.FloatNullableWithAggregatesFilter<"Market"> | number | null
+  volume?: Prisma.FloatNullableWithAggregatesFilter<"Market"> | number | null
+  tokenIdYes?: Prisma.StringNullableWithAggregatesFilter<"Market"> | string | null
+  tokenIdNo?: Prisma.StringNullableWithAggregatesFilter<"Market"> | string | null
+  tickSize?: Prisma.DecimalNullableWithAggregatesFilter<"Market"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  negRisk?: Prisma.BoolWithAggregatesFilter<"Market"> | boolean
+  active?: Prisma.BoolWithAggregatesFilter<"Market"> | boolean
+  polymarketUrl?: Prisma.StringNullableWithAggregatesFilter<"Market"> | string | null
 }
 
 export type MarketCreateInput = {
   id: string
   title: string
+  description?: string | null
   category: string
-  p0: number
+  p0?: number | null
   resolution?: string | null
   resolvedAt?: Date | string | null
+  endDate: Date | string
+  currentPriceYes?: number | null
+  currentPriceNo?: number | null
+  liquidity?: number | null
+  volume?: number | null
+  tokenIdYes?: string | null
+  tokenIdNo?: string | null
+  tickSize?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  negRisk?: boolean
+  active?: boolean
+  polymarketUrl?: string | null
   draftPicks?: Prisma.DraftPickCreateNestedManyWithoutMarketInput
 }
 
 export type MarketUncheckedCreateInput = {
   id: string
   title: string
+  description?: string | null
   category: string
-  p0: number
+  p0?: number | null
   resolution?: string | null
   resolvedAt?: Date | string | null
+  endDate: Date | string
+  currentPriceYes?: number | null
+  currentPriceNo?: number | null
+  liquidity?: number | null
+  volume?: number | null
+  tokenIdYes?: string | null
+  tokenIdNo?: string | null
+  tickSize?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  negRisk?: boolean
+  active?: boolean
+  polymarketUrl?: string | null
   draftPicks?: Prisma.DraftPickUncheckedCreateNestedManyWithoutMarketInput
 }
 
 export type MarketUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  p0?: Prisma.FloatFieldUpdateOperationsInput | number
+  p0?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentPriceYes?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  currentPriceNo?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  liquidity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  volume?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  tokenIdYes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenIdNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tickSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  negRisk?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  polymarketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftPicks?: Prisma.DraftPickUpdateManyWithoutMarketNestedInput
 }
 
 export type MarketUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  p0?: Prisma.FloatFieldUpdateOperationsInput | number
+  p0?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentPriceYes?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  currentPriceNo?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  liquidity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  volume?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  tokenIdYes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenIdNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tickSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  negRisk?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  polymarketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftPicks?: Prisma.DraftPickUncheckedUpdateManyWithoutMarketNestedInput
 }
 
 export type MarketCreateManyInput = {
   id: string
   title: string
+  description?: string | null
   category: string
-  p0: number
+  p0?: number | null
   resolution?: string | null
   resolvedAt?: Date | string | null
+  endDate: Date | string
+  currentPriceYes?: number | null
+  currentPriceNo?: number | null
+  liquidity?: number | null
+  volume?: number | null
+  tokenIdYes?: string | null
+  tokenIdNo?: string | null
+  tickSize?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  negRisk?: boolean
+  active?: boolean
+  polymarketUrl?: string | null
 }
 
 export type MarketUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  p0?: Prisma.FloatFieldUpdateOperationsInput | number
+  p0?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentPriceYes?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  currentPriceNo?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  liquidity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  volume?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  tokenIdYes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenIdNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tickSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  negRisk?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  polymarketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MarketUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  p0?: Prisma.FloatFieldUpdateOperationsInput | number
+  p0?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentPriceYes?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  currentPriceNo?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  liquidity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  volume?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  tokenIdYes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenIdNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tickSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  negRisk?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  polymarketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MarketCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   category?: Prisma.SortOrder
   p0?: Prisma.SortOrder
   resolution?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrder
+  endDate?: Prisma.SortOrder
+  currentPriceYes?: Prisma.SortOrder
+  currentPriceNo?: Prisma.SortOrder
+  liquidity?: Prisma.SortOrder
+  volume?: Prisma.SortOrder
+  tokenIdYes?: Prisma.SortOrder
+  tokenIdNo?: Prisma.SortOrder
+  tickSize?: Prisma.SortOrder
+  negRisk?: Prisma.SortOrder
+  active?: Prisma.SortOrder
+  polymarketUrl?: Prisma.SortOrder
 }
 
 export type MarketAvgOrderByAggregateInput = {
   p0?: Prisma.SortOrder
+  currentPriceYes?: Prisma.SortOrder
+  currentPriceNo?: Prisma.SortOrder
+  liquidity?: Prisma.SortOrder
+  volume?: Prisma.SortOrder
+  tickSize?: Prisma.SortOrder
 }
 
 export type MarketMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   category?: Prisma.SortOrder
   p0?: Prisma.SortOrder
   resolution?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrder
+  endDate?: Prisma.SortOrder
+  currentPriceYes?: Prisma.SortOrder
+  currentPriceNo?: Prisma.SortOrder
+  liquidity?: Prisma.SortOrder
+  volume?: Prisma.SortOrder
+  tokenIdYes?: Prisma.SortOrder
+  tokenIdNo?: Prisma.SortOrder
+  tickSize?: Prisma.SortOrder
+  negRisk?: Prisma.SortOrder
+  active?: Prisma.SortOrder
+  polymarketUrl?: Prisma.SortOrder
 }
 
 export type MarketMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   category?: Prisma.SortOrder
   p0?: Prisma.SortOrder
   resolution?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrder
+  endDate?: Prisma.SortOrder
+  currentPriceYes?: Prisma.SortOrder
+  currentPriceNo?: Prisma.SortOrder
+  liquidity?: Prisma.SortOrder
+  volume?: Prisma.SortOrder
+  tokenIdYes?: Prisma.SortOrder
+  tokenIdNo?: Prisma.SortOrder
+  tickSize?: Prisma.SortOrder
+  negRisk?: Prisma.SortOrder
+  active?: Prisma.SortOrder
+  polymarketUrl?: Prisma.SortOrder
 }
 
 export type MarketSumOrderByAggregateInput = {
   p0?: Prisma.SortOrder
+  currentPriceYes?: Prisma.SortOrder
+  currentPriceNo?: Prisma.SortOrder
+  liquidity?: Prisma.SortOrder
+  volume?: Prisma.SortOrder
+  tickSize?: Prisma.SortOrder
 }
 
 export type MarketScalarRelationFilter = {
@@ -387,8 +681,28 @@ export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
+}
+
+export type NullableDecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type MarketCreateNestedOneWithoutDraftPicksInput = {
@@ -408,19 +722,43 @@ export type MarketUpdateOneRequiredWithoutDraftPicksNestedInput = {
 export type MarketCreateWithoutDraftPicksInput = {
   id: string
   title: string
+  description?: string | null
   category: string
-  p0: number
+  p0?: number | null
   resolution?: string | null
   resolvedAt?: Date | string | null
+  endDate: Date | string
+  currentPriceYes?: number | null
+  currentPriceNo?: number | null
+  liquidity?: number | null
+  volume?: number | null
+  tokenIdYes?: string | null
+  tokenIdNo?: string | null
+  tickSize?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  negRisk?: boolean
+  active?: boolean
+  polymarketUrl?: string | null
 }
 
 export type MarketUncheckedCreateWithoutDraftPicksInput = {
   id: string
   title: string
+  description?: string | null
   category: string
-  p0: number
+  p0?: number | null
   resolution?: string | null
   resolvedAt?: Date | string | null
+  endDate: Date | string
+  currentPriceYes?: number | null
+  currentPriceNo?: number | null
+  liquidity?: number | null
+  volume?: number | null
+  tokenIdYes?: string | null
+  tokenIdNo?: string | null
+  tickSize?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  negRisk?: boolean
+  active?: boolean
+  polymarketUrl?: string | null
 }
 
 export type MarketCreateOrConnectWithoutDraftPicksInput = {
@@ -442,19 +780,43 @@ export type MarketUpdateToOneWithWhereWithoutDraftPicksInput = {
 export type MarketUpdateWithoutDraftPicksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  p0?: Prisma.FloatFieldUpdateOperationsInput | number
+  p0?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentPriceYes?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  currentPriceNo?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  liquidity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  volume?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  tokenIdYes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenIdNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tickSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  negRisk?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  polymarketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MarketUncheckedUpdateWithoutDraftPicksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  p0?: Prisma.FloatFieldUpdateOperationsInput | number
+  p0?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentPriceYes?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  currentPriceNo?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  liquidity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  volume?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  tokenIdYes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenIdNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tickSize?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  negRisk?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  polymarketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -491,10 +853,22 @@ export type MarketCountOutputTypeCountDraftPicksArgs<ExtArgs extends runtime.Typ
 export type MarketSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
+  description?: boolean
   category?: boolean
   p0?: boolean
   resolution?: boolean
   resolvedAt?: boolean
+  endDate?: boolean
+  currentPriceYes?: boolean
+  currentPriceNo?: boolean
+  liquidity?: boolean
+  volume?: boolean
+  tokenIdYes?: boolean
+  tokenIdNo?: boolean
+  tickSize?: boolean
+  negRisk?: boolean
+  active?: boolean
+  polymarketUrl?: boolean
   draftPicks?: boolean | Prisma.Market$draftPicksArgs<ExtArgs>
   _count?: boolean | Prisma.MarketCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["market"]>
@@ -502,31 +876,67 @@ export type MarketSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type MarketSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
+  description?: boolean
   category?: boolean
   p0?: boolean
   resolution?: boolean
   resolvedAt?: boolean
+  endDate?: boolean
+  currentPriceYes?: boolean
+  currentPriceNo?: boolean
+  liquidity?: boolean
+  volume?: boolean
+  tokenIdYes?: boolean
+  tokenIdNo?: boolean
+  tickSize?: boolean
+  negRisk?: boolean
+  active?: boolean
+  polymarketUrl?: boolean
 }, ExtArgs["result"]["market"]>
 
 export type MarketSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
+  description?: boolean
   category?: boolean
   p0?: boolean
   resolution?: boolean
   resolvedAt?: boolean
+  endDate?: boolean
+  currentPriceYes?: boolean
+  currentPriceNo?: boolean
+  liquidity?: boolean
+  volume?: boolean
+  tokenIdYes?: boolean
+  tokenIdNo?: boolean
+  tickSize?: boolean
+  negRisk?: boolean
+  active?: boolean
+  polymarketUrl?: boolean
 }, ExtArgs["result"]["market"]>
 
 export type MarketSelectScalar = {
   id?: boolean
   title?: boolean
+  description?: boolean
   category?: boolean
   p0?: boolean
   resolution?: boolean
   resolvedAt?: boolean
+  endDate?: boolean
+  currentPriceYes?: boolean
+  currentPriceNo?: boolean
+  liquidity?: boolean
+  volume?: boolean
+  tokenIdYes?: boolean
+  tokenIdNo?: boolean
+  tickSize?: boolean
+  negRisk?: boolean
+  active?: boolean
+  polymarketUrl?: boolean
 }
 
-export type MarketOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "category" | "p0" | "resolution" | "resolvedAt", ExtArgs["result"]["market"]>
+export type MarketOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "category" | "p0" | "resolution" | "resolvedAt" | "endDate" | "currentPriceYes" | "currentPriceNo" | "liquidity" | "volume" | "tokenIdYes" | "tokenIdNo" | "tickSize" | "negRisk" | "active" | "polymarketUrl", ExtArgs["result"]["market"]>
 export type MarketInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   draftPicks?: boolean | Prisma.Market$draftPicksArgs<ExtArgs>
   _count?: boolean | Prisma.MarketCountOutputTypeDefaultArgs<ExtArgs>
@@ -542,10 +952,22 @@ export type $MarketPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     title: string
+    description: string | null
     category: string
-    p0: number
+    p0: number | null
     resolution: string | null
     resolvedAt: Date | null
+    endDate: Date
+    currentPriceYes: number | null
+    currentPriceNo: number | null
+    liquidity: number | null
+    volume: number | null
+    tokenIdYes: string | null
+    tokenIdNo: string | null
+    tickSize: runtime.Decimal | null
+    negRisk: boolean
+    active: boolean
+    polymarketUrl: string | null
   }, ExtArgs["result"]["market"]>
   composites: {}
 }
@@ -972,10 +1394,22 @@ export interface Prisma__MarketClient<T, Null = never, ExtArgs extends runtime.T
 export interface MarketFieldRefs {
   readonly id: Prisma.FieldRef<"Market", 'String'>
   readonly title: Prisma.FieldRef<"Market", 'String'>
+  readonly description: Prisma.FieldRef<"Market", 'String'>
   readonly category: Prisma.FieldRef<"Market", 'String'>
   readonly p0: Prisma.FieldRef<"Market", 'Float'>
   readonly resolution: Prisma.FieldRef<"Market", 'String'>
   readonly resolvedAt: Prisma.FieldRef<"Market", 'DateTime'>
+  readonly endDate: Prisma.FieldRef<"Market", 'DateTime'>
+  readonly currentPriceYes: Prisma.FieldRef<"Market", 'Float'>
+  readonly currentPriceNo: Prisma.FieldRef<"Market", 'Float'>
+  readonly liquidity: Prisma.FieldRef<"Market", 'Float'>
+  readonly volume: Prisma.FieldRef<"Market", 'Float'>
+  readonly tokenIdYes: Prisma.FieldRef<"Market", 'String'>
+  readonly tokenIdNo: Prisma.FieldRef<"Market", 'String'>
+  readonly tickSize: Prisma.FieldRef<"Market", 'Decimal'>
+  readonly negRisk: Prisma.FieldRef<"Market", 'Boolean'>
+  readonly active: Prisma.FieldRef<"Market", 'Boolean'>
+  readonly polymarketUrl: Prisma.FieldRef<"Market", 'String'>
 }
     
 

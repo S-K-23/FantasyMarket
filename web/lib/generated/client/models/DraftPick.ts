@@ -591,18 +591,6 @@ export type DraftPickUncheckedUpdateManyWithoutMarketNestedInput = {
   deleteMany?: Prisma.DraftPickScalarWhereInput | Prisma.DraftPickScalarWhereInput[]
 }
 
-export type NullableFloatFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type DraftPickCreateWithoutLeagueInput = {
   player: string
   prediction: string

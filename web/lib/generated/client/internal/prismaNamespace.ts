@@ -777,10 +777,22 @@ export type PlayerStatsScalarFieldEnum = (typeof PlayerStatsScalarFieldEnum)[key
 export const MarketScalarFieldEnum = {
   id: 'id',
   title: 'title',
+  description: 'description',
   category: 'category',
   p0: 'p0',
   resolution: 'resolution',
-  resolvedAt: 'resolvedAt'
+  resolvedAt: 'resolvedAt',
+  endDate: 'endDate',
+  currentPriceYes: 'currentPriceYes',
+  currentPriceNo: 'currentPriceNo',
+  liquidity: 'liquidity',
+  volume: 'volume',
+  tokenIdYes: 'tokenIdYes',
+  tokenIdNo: 'tokenIdNo',
+  tickSize: 'tickSize',
+  negRisk: 'negRisk',
+  active: 'active',
+  polymarketUrl: 'polymarketUrl'
 } as const
 
 export type MarketScalarFieldEnum = (typeof MarketScalarFieldEnum)[keyof typeof MarketScalarFieldEnum]
@@ -885,6 +897,20 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal'
+ */
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal[]'
+ */
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
     
 
 

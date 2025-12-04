@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
 }
 
 model League {
@@ -40,14 +40,28 @@ model PlayerStats {
 }
 
 model Market {
-  id          String   @id // Polymarket Market ID
-  title       String
-  category    String
-  p0          Float    // Initial probability
-  resolution  String?  // YES, NO, INVALID
-  resolvedAt  DateTime?
+  id              String    @id // Polymarket Market ID
+  title           String
+  description     String?
+  category        String
+  p0              Float?    // Initial probability
+  resolution      String?   // YES, NO, INVALID
+  resolvedAt      DateTime?
   
-  draftPicks  DraftPick[]
+  // Polymarket Data
+  endDate         DateTime
+  currentPriceYes Float?
+  currentPriceNo  Float?
+  liquidity       Float?
+  volume          Float?
+  tokenIdYes      String?
+  tokenIdNo       String?
+  tickSize        Decimal?  @db.Decimal(8, 6)
+  negRisk         Boolean   @default(false)
+  active          Boolean   @default(true)
+  polymarketUrl   String?
+
+  draftPicks      DraftPick[]
 }
 
 model DraftPick {
