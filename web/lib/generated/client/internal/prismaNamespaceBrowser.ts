@@ -108,10 +108,22 @@ export type PlayerStatsScalarFieldEnum = (typeof PlayerStatsScalarFieldEnum)[key
 export const MarketScalarFieldEnum = {
   id: 'id',
   title: 'title',
+  description: 'description',
   category: 'category',
   p0: 'p0',
   resolution: 'resolution',
-  resolvedAt: 'resolvedAt'
+  resolvedAt: 'resolvedAt',
+  endDate: 'endDate',
+  currentPriceYes: 'currentPriceYes',
+  currentPriceNo: 'currentPriceNo',
+  liquidity: 'liquidity',
+  volume: 'volume',
+  tokenIdYes: 'tokenIdYes',
+  tokenIdNo: 'tokenIdNo',
+  tickSize: 'tickSize',
+  negRisk: 'negRisk',
+  active: 'active',
+  polymarketUrl: 'polymarketUrl'
 } as const
 
 export type MarketScalarFieldEnum = (typeof MarketScalarFieldEnum)[keyof typeof MarketScalarFieldEnum]

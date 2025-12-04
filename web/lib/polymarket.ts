@@ -1,28 +1,40 @@
 const BASE_URL = 'https://gamma-api.polymarket.com';
 
-export interface Market {
+export interface GammaMarket {
   id: string;
-  conditionId: string;
   question: string;
+  description: string;
+  category: string;
   slug: string;
-  resolutionDate: string; // ISO string
   endDate: string; // ISO string
-  tokens: {
+  active: boolean;
+  closed: boolean;
+  liquidity: number;
+  volume: number;
+  outcomes: string[]; // ["Yes", "No"]
+  outcomePrices: string[]; // ["0.65", "0.35"]
+  clobTokenIds: string[]; // ["token_yes", "token_no"]
+  tokens?: {
     tokenId: string;
-    outcome: string; // "Yes", "No"
+    outcome: string;
     price: number;
     winner: boolean;
   }[];
-  active: boolean;
-  closed: boolean;
-  volume: number;
-  liquidity: number;
-  tags: { id: string; label: string; slug: string }[];
-  image?: string;
-  description?: string;
 }
 
-export async function getMarkets(params: Record<string, any> = {}): Promise<Market[]> {
+export interface MarketFilterParams {
+  limit?: number;
+  offset?: number;
+  active?: boolean;
+  closed?: boolean;
+  category?: string;
+  order?: string; // "liquidity" | "volume" | "endDate"
+  ascending?: boolean;
+  min_liquidity?: number;
+  resolves_before?: string; // ISO date
+}
+
+export async function getMarkets(params: MarketFilterParams = {}): Promise<GammaMarket[]> {
   const url = new URL(`${BASE_URL}/markets`);
 
   // Default params
@@ -46,7 +58,7 @@ export async function getMarkets(params: Record<string, any> = {}): Promise<Mark
   }
 }
 
-export async function getMarket(id: string): Promise<Market | null> {
+export async function getMarket(id: string): Promise<GammaMarket | null> {
   try {
     const res = await fetch(`${BASE_URL}/markets/${id}`);
     if (!res.ok) {
@@ -59,3 +71,4 @@ export async function getMarket(id: string): Promise<Market | null> {
     return null;
   }
 }
+

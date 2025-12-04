@@ -255,6 +255,14 @@ export default function LeagueLobby() {
 
                 {/* Actions */}
                 <div className="flex flex-col gap-4">
+                    {/* Mock Draft Button - For Testing */}
+                    <Link
+                        href={`/league/${params.id}/mock-draft`}
+                        className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl text-lg font-bold transition text-center"
+                    >
+                        🧪 Mock Draft (Testing Mode)
+                    </Link>
+
                     {/* Start Draft Button - Only for Creator */}
                     {isCreator && league.status === 'SETUP' && (
                         <button
