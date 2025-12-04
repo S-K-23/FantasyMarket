@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model League {
+  id              Int      @id @default(autoincrement())
+  leagueId        String   @unique // On-chain PDA address or ID
+  name            String
+  creator         String   // Pubkey
+  buyIn           Float
+  currency        String   // SOL or USDC
+  maxPlayers      Int
+  currentPlayers  Int      @default(0)
+  status          String   // SETUP, DRAFTING, ACTIVE, COMPLETED
+  currentSession  Int      @default(1)
+  totalSessions   Int
+  createdAt       DateTime @default(now())
+  
+  players         PlayerStats[]
+  draftPicks      DraftPick[]
+}
+
+model PlayerStats {
+  id        Int     @id @default(autoincrement())
+  leagueId  Int
+  league    League  @relation(fields: [leagueId], references: [id])
+  address   String  // Pubkey
+  points    Float   @default(0)
+  streak    Int     @default(0)
+  rank      Int?
+  
+  @@unique([leagueId, address])
+}
+
+model Market {
+  id          String   @id // Polymarket Market ID
+  title       String
+  category    String
+  p0          Float    // Initial probability
+  resolution  String?  // YES, NO, INVALID
+  resolvedAt  DateTime?
+  
+  draftPicks  DraftPick[]
+}
+
+model DraftPick {
+  id          Int      @id @default(autoincrement())
+  leagueId    Int
+  league      League   @relation(fields: [leagueId], references: [id])
+  marketId    String
+  market      Market   @relation(fields: [marketId], references: [id])
+  player      String   // Pubkey
+  prediction  String   // YES or NO
+  session     Int
+  pickIndex   Int
+  points      Float?
+  isResolved  Boolean  @default(false)
+  
+  @@unique([leagueId, marketId, prediction])
+}

@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+/web/node_modules/
+/anchor/node_modules/
+
+# Rust
+target/
+/anchor/target/
+
+# Env files
+.env.local
+/web/.env.local
+/web/.env
+
+# Next.js
+.next/
+/web/.next/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
