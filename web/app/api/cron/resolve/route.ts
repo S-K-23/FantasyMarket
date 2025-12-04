@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getMarket } from '@/lib/polymarket';
 import { Connection, Keypair, PublicKey } from '@solana/web3.js';
-import { Program, AnchorProvider, Wallet, Idl } from '@coral-xyz/anchor';
+import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
+import { NodeWallet } from '@/lib/wallet';
 
-// Minimal IDL since build failed to generate it automatically
+// Updated IDL to match lib.rs
 const IDL: any = {
     "version": "0.1.0",
     "name": "anchor",
@@ -34,7 +35,7 @@ export async function GET() {
         // 1. Fetch unresolved picks
         const unresolvedPicks = await prisma.draftPick.findMany({
             where: { isResolved: false },
-            include: { league: true } // Need league info?
+            include: { league: true }
         });
 
         if (unresolvedPicks.length === 0) {
@@ -50,17 +51,14 @@ export async function GET() {
             const market = await getMarket(marketId as string);
             if (!market) continue;
 
-            if (market.closed && market.active === false) { // Assuming closed means resolved
+            if (market.closed && market.active === false) {
                 // Find the winning outcome
-                // Polymarket API structure for resolution?
-                // Usually `tokens` has `winner: true`.
                 const winningToken = market.tokens.find(t => t.winner);
                 if (winningToken) {
                     const outcome = winningToken.outcome === 'Yes';
-                    const finalProb = outcome ? 10000 : 0; // 100% or 0%
+                    const finalProb = outcome ? 10000 : 0;
 
                     // 4. Trigger on-chain resolution
-                    // Setup Anchor
                     if (!process.env.KEEPER_KEY) {
                         console.error("KEEPER_KEY not set");
                         continue;
@@ -70,55 +68,57 @@ export async function GET() {
                     const keeperKey = Keypair.fromSecretKey(
                         new Uint8Array(JSON.parse(process.env.KEEPER_KEY))
                     );
-                    const wallet = new Wallet(keeperKey);
+                    const wallet = new NodeWallet(keeperKey);
                     const provider = new AnchorProvider(connection, wallet, {});
-                    // Program constructor: (idl, provider) or (idl, programId, provider)
-                    // In newer versions, it infers address from IDL if present, or takes it as arg.
-                    // Let's use (idl, provider) if IDL has address, or (idl, address, provider).
-                    const programId = new PublicKey("HtJHB7t3esZkEdZhvUHQNYj4RYXrQsGxqzRoyMzmsBJQ");
                     const program = new Program(IDL, provider);
 
                     // Find picks for this market
                     const picksToResolve = unresolvedPicks.filter((p: any) => p.marketId === marketId);
 
                     for (const pick of picksToResolve) {
-                        // Derive PDAs
-                        // We need to reconstruct seeds.
-                        // League PDA: [b"league", league_id]
-                        // DraftPick PDA: [b"draft_pick", league_key, session, market_id, prediction]
-                        // PlayerState PDA: [b"player_state", league_key, player_key]
-
-                        // This requires knowing the exact PDAs.
-                        // We can store PDA addresses in DB to make this easier?
-                        // Or re-derive.
-                        // Re-deriving requires `league_id` (u64) and `player` (Pubkey).
-                        // `DraftPick` model in DB has `leagueId` (Int, DB ID) and `player` (String).
-                        // `League` model has `leagueId` (String, on-chain ID/Address?).
-                        // Schema says `leagueId String @unique // On-chain PDA address or ID`.
-                        // If it's the PDA address, we can use it directly.
-
-                        // Let's assume DB stores the PDA address in `league.leagueId`? 
-                        // Or the numeric ID? Schema comment says "On-chain PDA address or ID".
-                        // Let's assume it's the numeric ID for derivation?
-                        // Actually, `League` struct has `league_id: u64`.
-                        // If DB `leagueId` is the string representation of u64, we can parse it.
-
-                        // But wait, `DraftPick` seeds need `league.key()`.
-                        // So we need the League PDA address.
-                        // If we have the numeric ID, we can derive the League PDA.
-
-                        // Let's assume we can derive everything.
-
                         try {
-                            // Placeholder for actual call
-                            // await program.methods.resolveMarket(marketId, outcome, finalProb)
-                            //   .accounts({ ... })
-                            //   .rpc();
+                            // Derive PDAs
+                            // League PDA: [b"league", league_id]
+                            const leagueIdBN = new BN(pick.league.leagueId); // Assuming leagueId in DB is string of u64
+                            const [leaguePda] = PublicKey.findProgramAddressSync(
+                                [Buffer.from("league"), leagueIdBN.toArrayLike(Buffer, 'le', 8)],
+                                program.programId
+                            );
+
+                            // PlayerState PDA: [b"player_state", league_key, player_key]
+                            const playerKey = new PublicKey(pick.player);
+                            const [playerStatePda] = PublicKey.findProgramAddressSync(
+                                [Buffer.from("player_state"), leaguePda.toBuffer(), playerKey.toBuffer()],
+                                program.programId
+                            );
+
+                            // DraftPick PDA: [b"draft_pick", league_key, session, market_id, prediction]
+                            // Prediction seed: Yes=1, No=0
+                            const predictionSeed = pick.prediction === 'YES' ? 1 : 0;
+                            const [draftPickPda] = PublicKey.findProgramAddressSync(
+                                [
+                                    Buffer.from("draft_pick"),
+                                    leaguePda.toBuffer(),
+                                    new Uint8Array([pick.session]),
+                                    Buffer.from(pick.marketId),
+                                    new Uint8Array([predictionSeed])
+                                ],
+                                program.programId
+                            );
+
+                            await program.methods.resolveMarket(marketId, outcome, finalProb)
+                                .accounts({
+                                    league: leaguePda,
+                                    draftPick: draftPickPda,
+                                    playerState: playerStatePda,
+                                    signer: keeperKey.publicKey
+                                })
+                                .rpc();
 
                             // Update DB
                             await prisma.draftPick.update({
                                 where: { id: pick.id },
-                                data: { isResolved: true, points: 0 } // Points will be updated by indexer later?
+                                data: { isResolved: true }
                             });
 
                             results.push({ marketId, status: 'Resolved', pickId: pick.id });

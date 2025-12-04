@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client" // Prisma 7 client
+  output   = "../lib/generated/client"
 }
 
 datasource db {
@@ -18,6 +19,8 @@ model League {
   status          String   // SETUP, DRAFTING, ACTIVE, COMPLETED
   currentSession  Int      @default(1)
   totalSessions   Int
+  marketsPerSession Int    @default(5)
+  draftOrder      String[] @default([]) // Array of player addresses in draft order
   createdAt       DateTime @default(now())
   
   players         PlayerStats[]
@@ -48,17 +51,18 @@ model Market {
 }
 
 model DraftPick {
-  id          Int      @id @default(autoincrement())
-  leagueId    Int
-  league      League   @relation(fields: [leagueId], references: [id])
-  marketId    String
-  market      Market   @relation(fields: [marketId], references: [id])
-  player      String   // Pubkey
-  prediction  String   // YES or NO
-  session     Int
-  pickIndex   Int
-  points      Float?
-  isResolved  Boolean  @default(false)
+  id            Int      @id @default(autoincrement())
+  leagueId      Int
+  league        League   @relation(fields: [leagueId], references: [id])
+  marketId      String
+  market        Market   @relation(fields: [marketId], references: [id])
+  player        String   // Pubkey
+  prediction    String   // YES or NO
+  session       Int
+  pickIndex     Int
+  snapshotOdds  Int?     // Probability at draft time (basis points, e.g., 5000 = 50%)
+  points        Float?
+  isResolved    Boolean  @default(false)
   
   @@unique([leagueId, marketId, prediction])
 }

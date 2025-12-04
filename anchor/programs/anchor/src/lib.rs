@@ -50,17 +50,17 @@ pub mod anchor {
         require!(league.players.len() < 12, FflError::LeagueFull); // Max 12 players
         require!(!league.players.contains(&player.key()), FflError::AlreadyJoined);
 
-        // Transfer buy-in (SOL)
+        // Transfer buy-in (SOL) to treasury
         let ix = system_instruction::transfer(
             &player.key(),
-            &ctx.accounts.prize_pool_vault.key(),
+            &ctx.accounts.treasury.key(),
             league.buy_in_amount,
         );
         invoke(
             &ix,
             &[
                 player.to_account_info(),
-                ctx.accounts.prize_pool_vault.to_account_info(),
+                ctx.accounts.treasury.to_account_info(),
                 ctx.accounts.system_program.to_account_info(),
             ],
         )?;
@@ -226,12 +226,11 @@ pub mod anchor {
 
     pub fn end_season(ctx: Context<EndSeason>) -> Result<()> {
         let league = &mut ctx.accounts.league;
-        require!(league.state == LeagueState::Active, FflError::SessionNotActive);
         league.state = LeagueState::Completed;
         Ok(())
     }
     
-    pub fn claim_payout(ctx: Context<ClaimPayout>) -> Result<()> {
+    pub fn distribute_payout(ctx: Context<DistributePayout>) -> Result<()> {
         let league = &ctx.accounts.league;
         let player_state = &mut ctx.accounts.player_state;
         
@@ -249,27 +248,19 @@ pub mod anchor {
         };
         
         if payout > 0 {
-             let league_key = league.key();
-             let seeds = &[
-                b"prize_pool",
-                league_key.as_ref(),
-                &[ctx.bumps.prize_pool_vault],
-            ];
-            let signer_seeds = &[&seeds[..]];
-
+            // Transfer from Treasury to Player
             let ix = system_instruction::transfer(
-                &ctx.accounts.prize_pool_vault.key(),
+                &ctx.accounts.treasury.key(),
                 &ctx.accounts.player.key(),
                 payout,
             );
-            invoke_signed(
+            invoke(
                 &ix,
                 &[
-                    ctx.accounts.prize_pool_vault.to_account_info(),
+                    ctx.accounts.treasury.to_account_info(),
                     ctx.accounts.player.to_account_info(),
                     ctx.accounts.system_program.to_account_info(),
                 ],
-                signer_seeds,
             )?;
         }
         
@@ -317,13 +308,9 @@ pub struct JoinLeague<'info> {
     )]
     pub player_state: Account<'info, PlayerState>,
     
-    /// CHECK: PDA for prize pool vault
-    #[account(
-        mut,
-        seeds = [b"prize_pool", league.key().as_ref()],
-        bump
-    )]
-    pub prize_pool_vault: AccountInfo<'info>,
+    /// CHECK: Treasury wallet to receive buy-ins
+    #[account(mut)]
+    pub treasury: AccountInfo<'info>,
     
     #[account(mut)]
     pub player: Signer<'info>,
@@ -386,14 +373,15 @@ pub struct EndSeason<'info> {
 }
 
 #[derive(Accounts)]
-pub struct ClaimPayout<'info> {
+pub struct DistributePayout<'info> {
     #[account(mut)]
     pub league: Account<'info, League>,
     #[account(mut)]
     pub player_state: Account<'info, PlayerState>,
-    #[account(mut, seeds = [b"prize_pool", league.key().as_ref()], bump)]
-    pub prize_pool_vault: AccountInfo<'info>,
     #[account(mut)]
-    pub player: Signer<'info>,
+    pub treasury: Signer<'info>,
+    /// CHECK: Recipient
+    #[account(mut)]
+    pub player: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
 }

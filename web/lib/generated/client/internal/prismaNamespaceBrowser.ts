@@ -17,8 +17,8 @@
 
 import * as runtime from "@prisma/client/runtime/index-browser"
 
-export type * from '../models'
-export type * from './prismaNamespace'
+export type * from '../models.ts'
+export type * from './prismaNamespace.ts'
 
 export const Decimal = runtime.Decimal
 
@@ -85,10 +85,9 @@ export const LeagueScalarFieldEnum = {
   status: 'status',
   currentSession: 'currentSession',
   totalSessions: 'totalSessions',
-  createdAt: 'createdAt',
+  marketsPerSession: 'marketsPerSession',
   draftOrder: 'draftOrder',
-  currentTurn: 'currentTurn',
-  draftRound: 'draftRound'
+  createdAt: 'createdAt'
 } as const
 
 export type LeagueScalarFieldEnum = (typeof LeagueScalarFieldEnum)[keyof typeof LeagueScalarFieldEnum]
@@ -100,8 +99,7 @@ export const PlayerStatsScalarFieldEnum = {
   address: 'address',
   points: 'points',
   streak: 'streak',
-  rank: 'rank',
-  paymentSignature: 'paymentSignature'
+  rank: 'rank'
 } as const
 
 export type PlayerStatsScalarFieldEnum = (typeof PlayerStatsScalarFieldEnum)[keyof typeof PlayerStatsScalarFieldEnum]
@@ -127,6 +125,7 @@ export const DraftPickScalarFieldEnum = {
   prediction: 'prediction',
   session: 'session',
   pickIndex: 'pickIndex',
+  snapshotOdds: 'snapshotOdds',
   points: 'points',
   isResolved: 'isResolved'
 } as const

@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model DraftPick
@@ -31,6 +31,7 @@ export type DraftPickAvgAggregateOutputType = {
   leagueId: number | null
   session: number | null
   pickIndex: number | null
+  snapshotOdds: number | null
   points: number | null
 }
 
@@ -39,6 +40,7 @@ export type DraftPickSumAggregateOutputType = {
   leagueId: number | null
   session: number | null
   pickIndex: number | null
+  snapshotOdds: number | null
   points: number | null
 }
 
@@ -50,6 +52,7 @@ export type DraftPickMinAggregateOutputType = {
   prediction: string | null
   session: number | null
   pickIndex: number | null
+  snapshotOdds: number | null
   points: number | null
   isResolved: boolean | null
 }
@@ -62,6 +65,7 @@ export type DraftPickMaxAggregateOutputType = {
   prediction: string | null
   session: number | null
   pickIndex: number | null
+  snapshotOdds: number | null
   points: number | null
   isResolved: boolean | null
 }
@@ -74,6 +78,7 @@ export type DraftPickCountAggregateOutputType = {
   prediction: number
   session: number
   pickIndex: number
+  snapshotOdds: number
   points: number
   isResolved: number
   _all: number
@@ -85,6 +90,7 @@ export type DraftPickAvgAggregateInputType = {
   leagueId?: true
   session?: true
   pickIndex?: true
+  snapshotOdds?: true
   points?: true
 }
 
@@ -93,6 +99,7 @@ export type DraftPickSumAggregateInputType = {
   leagueId?: true
   session?: true
   pickIndex?: true
+  snapshotOdds?: true
   points?: true
 }
 
@@ -104,6 +111,7 @@ export type DraftPickMinAggregateInputType = {
   prediction?: true
   session?: true
   pickIndex?: true
+  snapshotOdds?: true
   points?: true
   isResolved?: true
 }
@@ -116,6 +124,7 @@ export type DraftPickMaxAggregateInputType = {
   prediction?: true
   session?: true
   pickIndex?: true
+  snapshotOdds?: true
   points?: true
   isResolved?: true
 }
@@ -128,6 +137,7 @@ export type DraftPickCountAggregateInputType = {
   prediction?: true
   session?: true
   pickIndex?: true
+  snapshotOdds?: true
   points?: true
   isResolved?: true
   _all?: true
@@ -227,6 +237,7 @@ export type DraftPickGroupByOutputType = {
   prediction: string
   session: number
   pickIndex: number
+  snapshotOdds: number | null
   points: number | null
   isResolved: boolean
   _count: DraftPickCountAggregateOutputType | null
@@ -262,6 +273,7 @@ export type DraftPickWhereInput = {
   prediction?: Prisma.StringFilter<"DraftPick"> | string
   session?: Prisma.IntFilter<"DraftPick"> | number
   pickIndex?: Prisma.IntFilter<"DraftPick"> | number
+  snapshotOdds?: Prisma.IntNullableFilter<"DraftPick"> | number | null
   points?: Prisma.FloatNullableFilter<"DraftPick"> | number | null
   isResolved?: Prisma.BoolFilter<"DraftPick"> | boolean
   league?: Prisma.XOR<Prisma.LeagueScalarRelationFilter, Prisma.LeagueWhereInput>
@@ -276,6 +288,7 @@ export type DraftPickOrderByWithRelationInput = {
   prediction?: Prisma.SortOrder
   session?: Prisma.SortOrder
   pickIndex?: Prisma.SortOrder
+  snapshotOdds?: Prisma.SortOrderInput | Prisma.SortOrder
   points?: Prisma.SortOrderInput | Prisma.SortOrder
   isResolved?: Prisma.SortOrder
   league?: Prisma.LeagueOrderByWithRelationInput
@@ -294,6 +307,7 @@ export type DraftPickWhereUniqueInput = Prisma.AtLeast<{
   prediction?: Prisma.StringFilter<"DraftPick"> | string
   session?: Prisma.IntFilter<"DraftPick"> | number
   pickIndex?: Prisma.IntFilter<"DraftPick"> | number
+  snapshotOdds?: Prisma.IntNullableFilter<"DraftPick"> | number | null
   points?: Prisma.FloatNullableFilter<"DraftPick"> | number | null
   isResolved?: Prisma.BoolFilter<"DraftPick"> | boolean
   league?: Prisma.XOR<Prisma.LeagueScalarRelationFilter, Prisma.LeagueWhereInput>
@@ -308,6 +322,7 @@ export type DraftPickOrderByWithAggregationInput = {
   prediction?: Prisma.SortOrder
   session?: Prisma.SortOrder
   pickIndex?: Prisma.SortOrder
+  snapshotOdds?: Prisma.SortOrderInput | Prisma.SortOrder
   points?: Prisma.SortOrderInput | Prisma.SortOrder
   isResolved?: Prisma.SortOrder
   _count?: Prisma.DraftPickCountOrderByAggregateInput
@@ -328,6 +343,7 @@ export type DraftPickScalarWhereWithAggregatesInput = {
   prediction?: Prisma.StringWithAggregatesFilter<"DraftPick"> | string
   session?: Prisma.IntWithAggregatesFilter<"DraftPick"> | number
   pickIndex?: Prisma.IntWithAggregatesFilter<"DraftPick"> | number
+  snapshotOdds?: Prisma.IntNullableWithAggregatesFilter<"DraftPick"> | number | null
   points?: Prisma.FloatNullableWithAggregatesFilter<"DraftPick"> | number | null
   isResolved?: Prisma.BoolWithAggregatesFilter<"DraftPick"> | boolean
 }
@@ -337,6 +353,7 @@ export type DraftPickCreateInput = {
   prediction: string
   session: number
   pickIndex: number
+  snapshotOdds?: number | null
   points?: number | null
   isResolved?: boolean
   league: Prisma.LeagueCreateNestedOneWithoutDraftPicksInput
@@ -351,6 +368,7 @@ export type DraftPickUncheckedCreateInput = {
   prediction: string
   session: number
   pickIndex: number
+  snapshotOdds?: number | null
   points?: number | null
   isResolved?: boolean
 }
@@ -360,6 +378,7 @@ export type DraftPickUpdateInput = {
   prediction?: Prisma.StringFieldUpdateOperationsInput | string
   session?: Prisma.IntFieldUpdateOperationsInput | number
   pickIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  snapshotOdds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   points?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isResolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   league?: Prisma.LeagueUpdateOneRequiredWithoutDraftPicksNestedInput
@@ -374,6 +393,7 @@ export type DraftPickUncheckedUpdateInput = {
   prediction?: Prisma.StringFieldUpdateOperationsInput | string
   session?: Prisma.IntFieldUpdateOperationsInput | number
   pickIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  snapshotOdds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   points?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isResolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -386,6 +406,7 @@ export type DraftPickCreateManyInput = {
   prediction: string
   session: number
   pickIndex: number
+  snapshotOdds?: number | null
   points?: number | null
   isResolved?: boolean
 }
@@ -395,6 +416,7 @@ export type DraftPickUpdateManyMutationInput = {
   prediction?: Prisma.StringFieldUpdateOperationsInput | string
   session?: Prisma.IntFieldUpdateOperationsInput | number
   pickIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  snapshotOdds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   points?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isResolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -407,6 +429,7 @@ export type DraftPickUncheckedUpdateManyInput = {
   prediction?: Prisma.StringFieldUpdateOperationsInput | string
   session?: Prisma.IntFieldUpdateOperationsInput | number
   pickIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  snapshotOdds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   points?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isResolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -435,6 +458,7 @@ export type DraftPickCountOrderByAggregateInput = {
   prediction?: Prisma.SortOrder
   session?: Prisma.SortOrder
   pickIndex?: Prisma.SortOrder
+  snapshotOdds?: Prisma.SortOrder
   points?: Prisma.SortOrder
   isResolved?: Prisma.SortOrder
 }
@@ -444,6 +468,7 @@ export type DraftPickAvgOrderByAggregateInput = {
   leagueId?: Prisma.SortOrder
   session?: Prisma.SortOrder
   pickIndex?: Prisma.SortOrder
+  snapshotOdds?: Prisma.SortOrder
   points?: Prisma.SortOrder
 }
 
@@ -455,6 +480,7 @@ export type DraftPickMaxOrderByAggregateInput = {
   prediction?: Prisma.SortOrder
   session?: Prisma.SortOrder
   pickIndex?: Prisma.SortOrder
+  snapshotOdds?: Prisma.SortOrder
   points?: Prisma.SortOrder
   isResolved?: Prisma.SortOrder
 }
@@ -467,6 +493,7 @@ export type DraftPickMinOrderByAggregateInput = {
   prediction?: Prisma.SortOrder
   session?: Prisma.SortOrder
   pickIndex?: Prisma.SortOrder
+  snapshotOdds?: Prisma.SortOrder
   points?: Prisma.SortOrder
   isResolved?: Prisma.SortOrder
 }
@@ -476,6 +503,7 @@ export type DraftPickSumOrderByAggregateInput = {
   leagueId?: Prisma.SortOrder
   session?: Prisma.SortOrder
   pickIndex?: Prisma.SortOrder
+  snapshotOdds?: Prisma.SortOrder
   points?: Prisma.SortOrder
 }
 
@@ -580,6 +608,7 @@ export type DraftPickCreateWithoutLeagueInput = {
   prediction: string
   session: number
   pickIndex: number
+  snapshotOdds?: number | null
   points?: number | null
   isResolved?: boolean
   market: Prisma.MarketCreateNestedOneWithoutDraftPicksInput
@@ -592,6 +621,7 @@ export type DraftPickUncheckedCreateWithoutLeagueInput = {
   prediction: string
   session: number
   pickIndex: number
+  snapshotOdds?: number | null
   points?: number | null
   isResolved?: boolean
 }
@@ -633,6 +663,7 @@ export type DraftPickScalarWhereInput = {
   prediction?: Prisma.StringFilter<"DraftPick"> | string
   session?: Prisma.IntFilter<"DraftPick"> | number
   pickIndex?: Prisma.IntFilter<"DraftPick"> | number
+  snapshotOdds?: Prisma.IntNullableFilter<"DraftPick"> | number | null
   points?: Prisma.FloatNullableFilter<"DraftPick"> | number | null
   isResolved?: Prisma.BoolFilter<"DraftPick"> | boolean
 }
@@ -642,6 +673,7 @@ export type DraftPickCreateWithoutMarketInput = {
   prediction: string
   session: number
   pickIndex: number
+  snapshotOdds?: number | null
   points?: number | null
   isResolved?: boolean
   league: Prisma.LeagueCreateNestedOneWithoutDraftPicksInput
@@ -654,6 +686,7 @@ export type DraftPickUncheckedCreateWithoutMarketInput = {
   prediction: string
   session: number
   pickIndex: number
+  snapshotOdds?: number | null
   points?: number | null
   isResolved?: boolean
 }
@@ -691,6 +724,7 @@ export type DraftPickCreateManyLeagueInput = {
   prediction: string
   session: number
   pickIndex: number
+  snapshotOdds?: number | null
   points?: number | null
   isResolved?: boolean
 }
@@ -700,6 +734,7 @@ export type DraftPickUpdateWithoutLeagueInput = {
   prediction?: Prisma.StringFieldUpdateOperationsInput | string
   session?: Prisma.IntFieldUpdateOperationsInput | number
   pickIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  snapshotOdds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   points?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isResolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   market?: Prisma.MarketUpdateOneRequiredWithoutDraftPicksNestedInput
@@ -712,6 +747,7 @@ export type DraftPickUncheckedUpdateWithoutLeagueInput = {
   prediction?: Prisma.StringFieldUpdateOperationsInput | string
   session?: Prisma.IntFieldUpdateOperationsInput | number
   pickIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  snapshotOdds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   points?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isResolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -723,6 +759,7 @@ export type DraftPickUncheckedUpdateManyWithoutLeagueInput = {
   prediction?: Prisma.StringFieldUpdateOperationsInput | string
   session?: Prisma.IntFieldUpdateOperationsInput | number
   pickIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  snapshotOdds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   points?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isResolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -734,6 +771,7 @@ export type DraftPickCreateManyMarketInput = {
   prediction: string
   session: number
   pickIndex: number
+  snapshotOdds?: number | null
   points?: number | null
   isResolved?: boolean
 }
@@ -743,6 +781,7 @@ export type DraftPickUpdateWithoutMarketInput = {
   prediction?: Prisma.StringFieldUpdateOperationsInput | string
   session?: Prisma.IntFieldUpdateOperationsInput | number
   pickIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  snapshotOdds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   points?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isResolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   league?: Prisma.LeagueUpdateOneRequiredWithoutDraftPicksNestedInput
@@ -755,6 +794,7 @@ export type DraftPickUncheckedUpdateWithoutMarketInput = {
   prediction?: Prisma.StringFieldUpdateOperationsInput | string
   session?: Prisma.IntFieldUpdateOperationsInput | number
   pickIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  snapshotOdds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   points?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isResolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -766,6 +806,7 @@ export type DraftPickUncheckedUpdateManyWithoutMarketInput = {
   prediction?: Prisma.StringFieldUpdateOperationsInput | string
   session?: Prisma.IntFieldUpdateOperationsInput | number
   pickIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  snapshotOdds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   points?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isResolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -780,6 +821,7 @@ export type DraftPickSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   prediction?: boolean
   session?: boolean
   pickIndex?: boolean
+  snapshotOdds?: boolean
   points?: boolean
   isResolved?: boolean
   league?: boolean | Prisma.LeagueDefaultArgs<ExtArgs>
@@ -794,6 +836,7 @@ export type DraftPickSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   prediction?: boolean
   session?: boolean
   pickIndex?: boolean
+  snapshotOdds?: boolean
   points?: boolean
   isResolved?: boolean
   league?: boolean | Prisma.LeagueDefaultArgs<ExtArgs>
@@ -808,6 +851,7 @@ export type DraftPickSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   prediction?: boolean
   session?: boolean
   pickIndex?: boolean
+  snapshotOdds?: boolean
   points?: boolean
   isResolved?: boolean
   league?: boolean | Prisma.LeagueDefaultArgs<ExtArgs>
@@ -822,11 +866,12 @@ export type DraftPickSelectScalar = {
   prediction?: boolean
   session?: boolean
   pickIndex?: boolean
+  snapshotOdds?: boolean
   points?: boolean
   isResolved?: boolean
 }
 
-export type DraftPickOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "leagueId" | "marketId" | "player" | "prediction" | "session" | "pickIndex" | "points" | "isResolved", ExtArgs["result"]["draftPick"]>
+export type DraftPickOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "leagueId" | "marketId" | "player" | "prediction" | "session" | "pickIndex" | "snapshotOdds" | "points" | "isResolved", ExtArgs["result"]["draftPick"]>
 export type DraftPickInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   league?: boolean | Prisma.LeagueDefaultArgs<ExtArgs>
   market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
@@ -854,6 +899,7 @@ export type $DraftPickPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     prediction: string
     session: number
     pickIndex: number
+    snapshotOdds: number | null
     points: number | null
     isResolved: boolean
   }, ExtArgs["result"]["draftPick"]>
@@ -1288,6 +1334,7 @@ export interface DraftPickFieldRefs {
   readonly prediction: Prisma.FieldRef<"DraftPick", 'String'>
   readonly session: Prisma.FieldRef<"DraftPick", 'Int'>
   readonly pickIndex: Prisma.FieldRef<"DraftPick", 'Int'>
+  readonly snapshotOdds: Prisma.FieldRef<"DraftPick", 'Int'>
   readonly points: Prisma.FieldRef<"DraftPick", 'Float'>
   readonly isResolved: Prisma.FieldRef<"DraftPick", 'Boolean'>
 }

@@ -16,10 +16,10 @@
  */
 
 import * as runtime from "@prisma/client/runtime/client"
-import type * as Prisma from "../models"
-import { type PrismaClient } from "./class"
+import type * as Prisma from "../models.ts"
+import { type PrismaClient } from "./class.ts"
 
-export type * from '../models'
+export type * from '../models.ts'
 
 export type DMMF = typeof runtime.DMMF
 
@@ -754,10 +754,9 @@ export const LeagueScalarFieldEnum = {
   status: 'status',
   currentSession: 'currentSession',
   totalSessions: 'totalSessions',
-  createdAt: 'createdAt',
+  marketsPerSession: 'marketsPerSession',
   draftOrder: 'draftOrder',
-  currentTurn: 'currentTurn',
-  draftRound: 'draftRound'
+  createdAt: 'createdAt'
 } as const
 
 export type LeagueScalarFieldEnum = (typeof LeagueScalarFieldEnum)[keyof typeof LeagueScalarFieldEnum]
@@ -769,8 +768,7 @@ export const PlayerStatsScalarFieldEnum = {
   address: 'address',
   points: 'points',
   streak: 'streak',
-  rank: 'rank',
-  paymentSignature: 'paymentSignature'
+  rank: 'rank'
 } as const
 
 export type PlayerStatsScalarFieldEnum = (typeof PlayerStatsScalarFieldEnum)[keyof typeof PlayerStatsScalarFieldEnum]
@@ -796,6 +794,7 @@ export const DraftPickScalarFieldEnum = {
   prediction: 'prediction',
   session: 'session',
   pickIndex: 'pickIndex',
+  snapshotOdds: 'snapshotOdds',
   points: 'points',
   isResolved: 'isResolved'
 } as const

@@ -8,8 +8,8 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from './models/League'
-export type * from './models/PlayerStats'
-export type * from './models/Market'
-export type * from './models/DraftPick'
-export type * from './commonInputTypes'
+export type * from './models/League.ts'
+export type * from './models/PlayerStats.ts'
+export type * from './models/Market.ts'
+export type * from './models/DraftPick.ts'
+export type * from './commonInputTypes.ts'

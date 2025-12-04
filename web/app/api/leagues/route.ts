@@ -1,8 +1,46 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get('id');
+
+        // If an ID is provided, return that specific league
+        if (id) {
+            let league: any = null;
+
+            // Try numeric ID first
+            const numericId = parseInt(id);
+            if (!isNaN(numericId)) {
+                league = await prisma.league.findUnique({
+                    where: { id: numericId },
+                    include: {
+                        players: true,
+                        _count: { select: { players: true } }
+                    }
+                });
+            }
+
+            // If not found, try by leagueId string
+            if (!league) {
+                league = await prisma.league.findUnique({
+                    where: { leagueId: id },
+                    include: {
+                        players: true,
+                        _count: { select: { players: true } }
+                    }
+                });
+            }
+
+            if (!league) {
+                return NextResponse.json({ error: 'League not found' }, { status: 404 });
+            }
+
+            return NextResponse.json(league);
+        }
+
+        // No ID provided - return all leagues
         const leagues = await prisma.league.findMany({
             include: {
                 _count: {

@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model League
@@ -33,8 +33,7 @@ export type LeagueAvgAggregateOutputType = {
   currentPlayers: number | null
   currentSession: number | null
   totalSessions: number | null
-  currentTurn: number | null
-  draftRound: number | null
+  marketsPerSession: number | null
 }
 
 export type LeagueSumAggregateOutputType = {
@@ -44,8 +43,7 @@ export type LeagueSumAggregateOutputType = {
   currentPlayers: number | null
   currentSession: number | null
   totalSessions: number | null
-  currentTurn: number | null
-  draftRound: number | null
+  marketsPerSession: number | null
 }
 
 export type LeagueMinAggregateOutputType = {
@@ -60,9 +58,8 @@ export type LeagueMinAggregateOutputType = {
   status: string | null
   currentSession: number | null
   totalSessions: number | null
+  marketsPerSession: number | null
   createdAt: Date | null
-  currentTurn: number | null
-  draftRound: number | null
 }
 
 export type LeagueMaxAggregateOutputType = {
@@ -77,9 +74,8 @@ export type LeagueMaxAggregateOutputType = {
   status: string | null
   currentSession: number | null
   totalSessions: number | null
+  marketsPerSession: number | null
   createdAt: Date | null
-  currentTurn: number | null
-  draftRound: number | null
 }
 
 export type LeagueCountAggregateOutputType = {
@@ -94,10 +90,9 @@ export type LeagueCountAggregateOutputType = {
   status: number
   currentSession: number
   totalSessions: number
-  createdAt: number
+  marketsPerSession: number
   draftOrder: number
-  currentTurn: number
-  draftRound: number
+  createdAt: number
   _all: number
 }
 
@@ -109,8 +104,7 @@ export type LeagueAvgAggregateInputType = {
   currentPlayers?: true
   currentSession?: true
   totalSessions?: true
-  currentTurn?: true
-  draftRound?: true
+  marketsPerSession?: true
 }
 
 export type LeagueSumAggregateInputType = {
@@ -120,8 +114,7 @@ export type LeagueSumAggregateInputType = {
   currentPlayers?: true
   currentSession?: true
   totalSessions?: true
-  currentTurn?: true
-  draftRound?: true
+  marketsPerSession?: true
 }
 
 export type LeagueMinAggregateInputType = {
@@ -136,9 +129,8 @@ export type LeagueMinAggregateInputType = {
   status?: true
   currentSession?: true
   totalSessions?: true
+  marketsPerSession?: true
   createdAt?: true
-  currentTurn?: true
-  draftRound?: true
 }
 
 export type LeagueMaxAggregateInputType = {
@@ -153,9 +145,8 @@ export type LeagueMaxAggregateInputType = {
   status?: true
   currentSession?: true
   totalSessions?: true
+  marketsPerSession?: true
   createdAt?: true
-  currentTurn?: true
-  draftRound?: true
 }
 
 export type LeagueCountAggregateInputType = {
@@ -170,10 +161,9 @@ export type LeagueCountAggregateInputType = {
   status?: true
   currentSession?: true
   totalSessions?: true
-  createdAt?: true
+  marketsPerSession?: true
   draftOrder?: true
-  currentTurn?: true
-  draftRound?: true
+  createdAt?: true
   _all?: true
 }
 
@@ -275,10 +265,9 @@ export type LeagueGroupByOutputType = {
   status: string
   currentSession: number
   totalSessions: number
-  createdAt: Date
+  marketsPerSession: number
   draftOrder: string[]
-  currentTurn: number
-  draftRound: number
+  createdAt: Date
   _count: LeagueCountAggregateOutputType | null
   _avg: LeagueAvgAggregateOutputType | null
   _sum: LeagueSumAggregateOutputType | null
@@ -316,10 +305,9 @@ export type LeagueWhereInput = {
   status?: Prisma.StringFilter<"League"> | string
   currentSession?: Prisma.IntFilter<"League"> | number
   totalSessions?: Prisma.IntFilter<"League"> | number
-  createdAt?: Prisma.DateTimeFilter<"League"> | Date | string
+  marketsPerSession?: Prisma.IntFilter<"League"> | number
   draftOrder?: Prisma.StringNullableListFilter<"League">
-  currentTurn?: Prisma.IntFilter<"League"> | number
-  draftRound?: Prisma.IntFilter<"League"> | number
+  createdAt?: Prisma.DateTimeFilter<"League"> | Date | string
   players?: Prisma.PlayerStatsListRelationFilter
   draftPicks?: Prisma.DraftPickListRelationFilter
 }
@@ -336,10 +324,9 @@ export type LeagueOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   currentSession?: Prisma.SortOrder
   totalSessions?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  marketsPerSession?: Prisma.SortOrder
   draftOrder?: Prisma.SortOrder
-  currentTurn?: Prisma.SortOrder
-  draftRound?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   players?: Prisma.PlayerStatsOrderByRelationAggregateInput
   draftPicks?: Prisma.DraftPickOrderByRelationAggregateInput
 }
@@ -359,10 +346,9 @@ export type LeagueWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.StringFilter<"League"> | string
   currentSession?: Prisma.IntFilter<"League"> | number
   totalSessions?: Prisma.IntFilter<"League"> | number
-  createdAt?: Prisma.DateTimeFilter<"League"> | Date | string
+  marketsPerSession?: Prisma.IntFilter<"League"> | number
   draftOrder?: Prisma.StringNullableListFilter<"League">
-  currentTurn?: Prisma.IntFilter<"League"> | number
-  draftRound?: Prisma.IntFilter<"League"> | number
+  createdAt?: Prisma.DateTimeFilter<"League"> | Date | string
   players?: Prisma.PlayerStatsListRelationFilter
   draftPicks?: Prisma.DraftPickListRelationFilter
 }, "id" | "leagueId">
@@ -379,10 +365,9 @@ export type LeagueOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   currentSession?: Prisma.SortOrder
   totalSessions?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  marketsPerSession?: Prisma.SortOrder
   draftOrder?: Prisma.SortOrder
-  currentTurn?: Prisma.SortOrder
-  draftRound?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   _count?: Prisma.LeagueCountOrderByAggregateInput
   _avg?: Prisma.LeagueAvgOrderByAggregateInput
   _max?: Prisma.LeagueMaxOrderByAggregateInput
@@ -405,10 +390,9 @@ export type LeagueScalarWhereWithAggregatesInput = {
   status?: Prisma.StringWithAggregatesFilter<"League"> | string
   currentSession?: Prisma.IntWithAggregatesFilter<"League"> | number
   totalSessions?: Prisma.IntWithAggregatesFilter<"League"> | number
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"League"> | Date | string
+  marketsPerSession?: Prisma.IntWithAggregatesFilter<"League"> | number
   draftOrder?: Prisma.StringNullableListFilter<"League">
-  currentTurn?: Prisma.IntWithAggregatesFilter<"League"> | number
-  draftRound?: Prisma.IntWithAggregatesFilter<"League"> | number
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"League"> | Date | string
 }
 
 export type LeagueCreateInput = {
@@ -422,10 +406,9 @@ export type LeagueCreateInput = {
   status: string
   currentSession?: number
   totalSessions: number
-  createdAt?: Date | string
+  marketsPerSession?: number
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
-  currentTurn?: number
-  draftRound?: number
+  createdAt?: Date | string
   players?: Prisma.PlayerStatsCreateNestedManyWithoutLeagueInput
   draftPicks?: Prisma.DraftPickCreateNestedManyWithoutLeagueInput
 }
@@ -442,10 +425,9 @@ export type LeagueUncheckedCreateInput = {
   status: string
   currentSession?: number
   totalSessions: number
-  createdAt?: Date | string
+  marketsPerSession?: number
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
-  currentTurn?: number
-  draftRound?: number
+  createdAt?: Date | string
   players?: Prisma.PlayerStatsUncheckedCreateNestedManyWithoutLeagueInput
   draftPicks?: Prisma.DraftPickUncheckedCreateNestedManyWithoutLeagueInput
 }
@@ -461,10 +443,9 @@ export type LeagueUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   currentSession?: Prisma.IntFieldUpdateOperationsInput | number
   totalSessions?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
-  currentTurn?: Prisma.IntFieldUpdateOperationsInput | number
-  draftRound?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerStatsUpdateManyWithoutLeagueNestedInput
   draftPicks?: Prisma.DraftPickUpdateManyWithoutLeagueNestedInput
 }
@@ -481,10 +462,9 @@ export type LeagueUncheckedUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   currentSession?: Prisma.IntFieldUpdateOperationsInput | number
   totalSessions?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
-  currentTurn?: Prisma.IntFieldUpdateOperationsInput | number
-  draftRound?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerStatsUncheckedUpdateManyWithoutLeagueNestedInput
   draftPicks?: Prisma.DraftPickUncheckedUpdateManyWithoutLeagueNestedInput
 }
@@ -501,10 +481,9 @@ export type LeagueCreateManyInput = {
   status: string
   currentSession?: number
   totalSessions: number
-  createdAt?: Date | string
+  marketsPerSession?: number
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
-  currentTurn?: number
-  draftRound?: number
+  createdAt?: Date | string
 }
 
 export type LeagueUpdateManyMutationInput = {
@@ -518,10 +497,9 @@ export type LeagueUpdateManyMutationInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   currentSession?: Prisma.IntFieldUpdateOperationsInput | number
   totalSessions?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
-  currentTurn?: Prisma.IntFieldUpdateOperationsInput | number
-  draftRound?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type LeagueUncheckedUpdateManyInput = {
@@ -536,10 +514,9 @@ export type LeagueUncheckedUpdateManyInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   currentSession?: Prisma.IntFieldUpdateOperationsInput | number
   totalSessions?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
-  currentTurn?: Prisma.IntFieldUpdateOperationsInput | number
-  draftRound?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type StringNullableListFilter<$PrismaModel = never> = {
@@ -562,10 +539,9 @@ export type LeagueCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   currentSession?: Prisma.SortOrder
   totalSessions?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  marketsPerSession?: Prisma.SortOrder
   draftOrder?: Prisma.SortOrder
-  currentTurn?: Prisma.SortOrder
-  draftRound?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
 }
 
 export type LeagueAvgOrderByAggregateInput = {
@@ -575,8 +551,7 @@ export type LeagueAvgOrderByAggregateInput = {
   currentPlayers?: Prisma.SortOrder
   currentSession?: Prisma.SortOrder
   totalSessions?: Prisma.SortOrder
-  currentTurn?: Prisma.SortOrder
-  draftRound?: Prisma.SortOrder
+  marketsPerSession?: Prisma.SortOrder
 }
 
 export type LeagueMaxOrderByAggregateInput = {
@@ -591,9 +566,8 @@ export type LeagueMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   currentSession?: Prisma.SortOrder
   totalSessions?: Prisma.SortOrder
+  marketsPerSession?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  currentTurn?: Prisma.SortOrder
-  draftRound?: Prisma.SortOrder
 }
 
 export type LeagueMinOrderByAggregateInput = {
@@ -608,9 +582,8 @@ export type LeagueMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   currentSession?: Prisma.SortOrder
   totalSessions?: Prisma.SortOrder
+  marketsPerSession?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  currentTurn?: Prisma.SortOrder
-  draftRound?: Prisma.SortOrder
 }
 
 export type LeagueSumOrderByAggregateInput = {
@@ -620,8 +593,7 @@ export type LeagueSumOrderByAggregateInput = {
   currentPlayers?: Prisma.SortOrder
   currentSession?: Prisma.SortOrder
   totalSessions?: Prisma.SortOrder
-  currentTurn?: Prisma.SortOrder
-  draftRound?: Prisma.SortOrder
+  marketsPerSession?: Prisma.SortOrder
 }
 
 export type LeagueScalarRelationFilter = {
@@ -653,13 +625,13 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
-}
-
 export type LeagueUpdatedraftOrderInput = {
   set?: string[]
   push?: string | string[]
+}
+
+export type DateTimeFieldUpdateOperationsInput = {
+  set?: Date | string
 }
 
 export type LeagueCreateNestedOneWithoutPlayersInput = {
@@ -701,10 +673,9 @@ export type LeagueCreateWithoutPlayersInput = {
   status: string
   currentSession?: number
   totalSessions: number
-  createdAt?: Date | string
+  marketsPerSession?: number
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
-  currentTurn?: number
-  draftRound?: number
+  createdAt?: Date | string
   draftPicks?: Prisma.DraftPickCreateNestedManyWithoutLeagueInput
 }
 
@@ -720,10 +691,9 @@ export type LeagueUncheckedCreateWithoutPlayersInput = {
   status: string
   currentSession?: number
   totalSessions: number
-  createdAt?: Date | string
+  marketsPerSession?: number
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
-  currentTurn?: number
-  draftRound?: number
+  createdAt?: Date | string
   draftPicks?: Prisma.DraftPickUncheckedCreateNestedManyWithoutLeagueInput
 }
 
@@ -754,10 +724,9 @@ export type LeagueUpdateWithoutPlayersInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   currentSession?: Prisma.IntFieldUpdateOperationsInput | number
   totalSessions?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
-  currentTurn?: Prisma.IntFieldUpdateOperationsInput | number
-  draftRound?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   draftPicks?: Prisma.DraftPickUpdateManyWithoutLeagueNestedInput
 }
 
@@ -773,10 +742,9 @@ export type LeagueUncheckedUpdateWithoutPlayersInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   currentSession?: Prisma.IntFieldUpdateOperationsInput | number
   totalSessions?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
-  currentTurn?: Prisma.IntFieldUpdateOperationsInput | number
-  draftRound?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   draftPicks?: Prisma.DraftPickUncheckedUpdateManyWithoutLeagueNestedInput
 }
 
@@ -791,10 +759,9 @@ export type LeagueCreateWithoutDraftPicksInput = {
   status: string
   currentSession?: number
   totalSessions: number
-  createdAt?: Date | string
+  marketsPerSession?: number
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
-  currentTurn?: number
-  draftRound?: number
+  createdAt?: Date | string
   players?: Prisma.PlayerStatsCreateNestedManyWithoutLeagueInput
 }
 
@@ -810,10 +777,9 @@ export type LeagueUncheckedCreateWithoutDraftPicksInput = {
   status: string
   currentSession?: number
   totalSessions: number
-  createdAt?: Date | string
+  marketsPerSession?: number
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
-  currentTurn?: number
-  draftRound?: number
+  createdAt?: Date | string
   players?: Prisma.PlayerStatsUncheckedCreateNestedManyWithoutLeagueInput
 }
 
@@ -844,10 +810,9 @@ export type LeagueUpdateWithoutDraftPicksInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   currentSession?: Prisma.IntFieldUpdateOperationsInput | number
   totalSessions?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
-  currentTurn?: Prisma.IntFieldUpdateOperationsInput | number
-  draftRound?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerStatsUpdateManyWithoutLeagueNestedInput
 }
 
@@ -863,10 +828,9 @@ export type LeagueUncheckedUpdateWithoutDraftPicksInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   currentSession?: Prisma.IntFieldUpdateOperationsInput | number
   totalSessions?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
-  currentTurn?: Prisma.IntFieldUpdateOperationsInput | number
-  draftRound?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerStatsUncheckedUpdateManyWithoutLeagueNestedInput
 }
 
@@ -922,10 +886,9 @@ export type LeagueSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   status?: boolean
   currentSession?: boolean
   totalSessions?: boolean
-  createdAt?: boolean
+  marketsPerSession?: boolean
   draftOrder?: boolean
-  currentTurn?: boolean
-  draftRound?: boolean
+  createdAt?: boolean
   players?: boolean | Prisma.League$playersArgs<ExtArgs>
   draftPicks?: boolean | Prisma.League$draftPicksArgs<ExtArgs>
   _count?: boolean | Prisma.LeagueCountOutputTypeDefaultArgs<ExtArgs>
@@ -943,10 +906,9 @@ export type LeagueSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   status?: boolean
   currentSession?: boolean
   totalSessions?: boolean
-  createdAt?: boolean
+  marketsPerSession?: boolean
   draftOrder?: boolean
-  currentTurn?: boolean
-  draftRound?: boolean
+  createdAt?: boolean
 }, ExtArgs["result"]["league"]>
 
 export type LeagueSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -961,10 +923,9 @@ export type LeagueSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   status?: boolean
   currentSession?: boolean
   totalSessions?: boolean
-  createdAt?: boolean
+  marketsPerSession?: boolean
   draftOrder?: boolean
-  currentTurn?: boolean
-  draftRound?: boolean
+  createdAt?: boolean
 }, ExtArgs["result"]["league"]>
 
 export type LeagueSelectScalar = {
@@ -979,13 +940,12 @@ export type LeagueSelectScalar = {
   status?: boolean
   currentSession?: boolean
   totalSessions?: boolean
-  createdAt?: boolean
+  marketsPerSession?: boolean
   draftOrder?: boolean
-  currentTurn?: boolean
-  draftRound?: boolean
+  createdAt?: boolean
 }
 
-export type LeagueOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "leagueId" | "name" | "creator" | "buyIn" | "currency" | "maxPlayers" | "currentPlayers" | "status" | "currentSession" | "totalSessions" | "createdAt" | "draftOrder" | "currentTurn" | "draftRound", ExtArgs["result"]["league"]>
+export type LeagueOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "leagueId" | "name" | "creator" | "buyIn" | "currency" | "maxPlayers" | "currentPlayers" | "status" | "currentSession" | "totalSessions" | "marketsPerSession" | "draftOrder" | "createdAt", ExtArgs["result"]["league"]>
 export type LeagueInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   players?: boolean | Prisma.League$playersArgs<ExtArgs>
   draftPicks?: boolean | Prisma.League$draftPicksArgs<ExtArgs>
@@ -1012,10 +972,9 @@ export type $LeaguePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     status: string
     currentSession: number
     totalSessions: number
-    createdAt: Date
+    marketsPerSession: number
     draftOrder: string[]
-    currentTurn: number
-    draftRound: number
+    createdAt: Date
   }, ExtArgs["result"]["league"]>
   composites: {}
 }
@@ -1452,10 +1411,9 @@ export interface LeagueFieldRefs {
   readonly status: Prisma.FieldRef<"League", 'String'>
   readonly currentSession: Prisma.FieldRef<"League", 'Int'>
   readonly totalSessions: Prisma.FieldRef<"League", 'Int'>
-  readonly createdAt: Prisma.FieldRef<"League", 'DateTime'>
+  readonly marketsPerSession: Prisma.FieldRef<"League", 'Int'>
   readonly draftOrder: Prisma.FieldRef<"League", 'String[]'>
-  readonly currentTurn: Prisma.FieldRef<"League", 'Int'>
-  readonly draftRound: Prisma.FieldRef<"League", 'Int'>
+  readonly createdAt: Prisma.FieldRef<"League", 'DateTime'>
 }
     
 
