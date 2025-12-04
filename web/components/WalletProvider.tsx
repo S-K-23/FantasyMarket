@@ -15,22 +15,24 @@ import { clusterApiUrl } from '@solana/web3.js';
 
 export const AppWalletProvider = ({ children }: { children: React.ReactNode }) => {
     const network = WalletAdapterNetwork.Devnet;
-    const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+    const endpoint = useMemo(() => {
+        const rpc = process.env.NEXT_PUBLIC_RPC_URL || clusterApiUrl(network);
+        console.log("Using RPC:", rpc);
+        return rpc;
+    }, [network]);
 
+    // Simplified wallet list for faster initialization
     const wallets = useMemo(
         () => [
             new PhantomWalletAdapter(),
             new SolflareWalletAdapter(),
-            new CoinbaseWalletAdapter(),
-            new TrustWalletAdapter(),
-            new LedgerWalletAdapter(),
         ],
-        [network]
+        []
     );
 
     return (
         <ConnectionProvider endpoint={endpoint}>
-            <WalletProvider wallets={wallets} autoConnect>
+            <WalletProvider wallets={wallets}>
                 <WalletModalProvider>
                     {children}
                 </WalletModalProvider>

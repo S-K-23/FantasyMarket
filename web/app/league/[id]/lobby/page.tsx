@@ -142,8 +142,8 @@ export default function LeagueLobby() {
                     <div className="flex justify-between items-start mb-2">
                         <h1 className="text-4xl font-bold">{league.name}</h1>
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${league.status === 'SETUP' ? 'bg-yellow-600' :
-                                league.status === 'DRAFTING' ? 'bg-blue-600' :
-                                    league.status === 'ACTIVE' ? 'bg-green-600' : 'bg-gray-600'
+                            league.status === 'DRAFTING' ? 'bg-blue-600' :
+                                league.status === 'ACTIVE' ? 'bg-green-600' : 'bg-gray-600'
                             }`}>
                             {league.status}
                         </span>
@@ -189,11 +189,14 @@ export default function LeagueLobby() {
                     <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
                         <h3 className="font-semibold mb-4 text-lg">Share Invite Link</h3>
                         <div className="bg-gray-900 p-3 rounded-lg font-mono text-sm break-all text-gray-300">
-                            {typeof window !== 'undefined' ? `${window.location.origin}/league/join/${league.leagueId}` : 'Loading...'}
+                            {typeof window !== 'undefined'
+                                ? `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/league/join/${league.leagueId}`
+                                : 'Loading...'}
                         </div>
                         <button
                             onClick={() => {
-                                navigator.clipboard.writeText(`${window.location.origin}/league/join/${league.leagueId}`);
+                                const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+                                navigator.clipboard.writeText(`${baseUrl}/league/join/${league.leagueId}`);
                                 alert('Copied to clipboard!');
                             }}
                             className="mt-3 w-full py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-medium transition"
@@ -258,8 +261,8 @@ export default function LeagueLobby() {
                             onClick={handleStartDraft}
                             disabled={!canStartDraft || starting}
                             className={`w-full py-4 rounded-xl text-lg font-bold transition ${canStartDraft && !starting
-                                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500'
-                                    : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                                ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500'
+                                : 'bg-gray-700 text-gray-400 cursor-not-allowed'
                                 }`}
                         >
                             {starting

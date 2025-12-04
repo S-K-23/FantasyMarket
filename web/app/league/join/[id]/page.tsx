@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import Link from 'next/link';
-import { joinLeague } from '@/lib/program';
 
 // Centralized Treasury Wallet (Hardcoded for MVP/Hackathon as per user request)
 // In production, this should be an env var or derived.
@@ -24,24 +24,52 @@ export default function JoinLeaguePage() {
     const [error, setError] = useState('');
 
     useEffect(() => {
+        const fetchLeague = async () => {
+            try {
+                const res = await fetch(`/api/leagues/${params.id}`);
+                if (!res.ok) throw new Error('League not found');
+                const data = await res.json();
+                setLeague(data);
+            } catch (err) {
+                setError('Failed to load league details');
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         if (params.id) {
-            fetchLeague(params.id as string);
+            fetchLeague();
         }
     }, [params.id]);
 
-    const fetchLeague = async (id: string) => {
-        try {
-            const res = await fetch(`/api/leagues/${id}`);
-            if (!res.ok) throw new Error('League not found');
-            const data = await res.json();
-            setLeague(data);
-        } catch (err) {
-            setError('Failed to load league details');
-            console.error(err);
-        } finally {
-            setLoading(false);
+    // Check if already joined
+    useEffect(() => {
+        if (league && wallet.connected && wallet.publicKey) {
+            console.log("Checking if user is already in league...");
+            console.log("Wallet:", wallet.publicKey.toBase58());
+            console.log("League Players:", league.players);
+
+            const isMember = league.players?.some((p: any) => {
+                const match = p.address === wallet.publicKey?.toBase58();
+                console.log(`Checking ${p.address} vs ${wallet.publicKey?.toBase58()}: ${match}`);
+                return match;
+            });
+
+            if (isMember) {
+                console.log("User is a member, redirecting...");
+                router.push(`/league/${league.leagueId}/lobby`);
+            } else {
+                console.log("User is NOT a member.");
+            }
+        } else {
+            console.log("Waiting for league data or wallet connection...", {
+                hasLeague: !!league,
+                connected: wallet.connected,
+                hasKey: !!wallet.publicKey
+            });
         }
-    };
+    }, [league, wallet.connected, wallet.publicKey, router]);
 
     const handleJoin = async () => {
         if (!wallet.connected || !wallet.publicKey) {
@@ -59,6 +87,8 @@ export default function JoinLeaguePage() {
                 const leagueIdOnChain = parseInt(league.leagueId.replace('league_', ''));
                 console.log("Attempting on-chain join:", leagueIdOnChain);
 
+                // Dynamic import to avoid loading Anchor on page load
+                const { joinLeague } = await import('@/lib/program');
                 const tx = await joinLeague(
                     wallet,
                     connection,
@@ -155,8 +185,11 @@ export default function JoinLeaguePage() {
                         {joining ? 'Processing...' : `Pay ${league.buyIn} ${league.currency} to Join`}
                     </button>
                 ) : (
-                    <div className="text-center p-4 bg-muted rounded-md">
-                        Please connect your wallet to join.
+                    <div className="flex flex-col items-center gap-4 p-4 bg-muted rounded-md">
+                        <p className="text-sm text-muted-foreground">Please connect your wallet to join.</p>
+                        <div className="wallet-adapter-button-trigger">
+                            <WalletMultiButton />
+                        </div>
                     </div>
                 )}
 
