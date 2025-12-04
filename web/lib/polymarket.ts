@@ -24,14 +24,14 @@ export interface Market {
 
 export async function getMarkets(params: Record<string, any> = {}): Promise<Market[]> {
   const url = new URL(`${BASE_URL}/markets`);
-  
+
   // Default params
   if (!params.limit) params.limit = 50;
   if (!params.active) params.active = true;
   if (!params.closed) params.closed = false;
-  
+
   Object.keys(params).forEach(key => url.searchParams.append(key, String(params[key])));
-  
+
   try {
     const res = await fetch(url.toString());
     if (!res.ok) {
@@ -50,8 +50,8 @@ export async function getMarket(id: string): Promise<Market | null> {
   try {
     const res = await fetch(`${BASE_URL}/markets/${id}`);
     if (!res.ok) {
-        if (res.status === 404) return null;
-        throw new Error(`Failed to fetch market ${id}: ${res.statusText}`);
+      if (res.status === 404) return null;
+      throw new Error(`Failed to fetch market ${id}: ${res.statusText}`);
     }
     return res.json();
   } catch (error) {

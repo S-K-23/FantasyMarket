@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
+import { PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
 import Link from 'next/link';
 import { joinLeague } from '@/lib/program';
 
 // Centralized Treasury Wallet (Hardcoded for MVP/Hackathon as per user request)
 // In production, this should be an env var or derived.
 // Using a random public key for demo if not provided.
-const TREASURY_WALLET = new PublicKey("7CmuA67D5XNTE2YvFcNVPizVVvYYDsaSvP5hWgrC3k8A");
+const TREASURY_WALLET = new PublicKey("FgJ2LzyejgtyZeeU2GdHuykS4br5fcK5wQexZaAoRKaA");
 
 export default function JoinLeaguePage() {
     const params = useParams();
@@ -54,6 +54,7 @@ export default function JoinLeaguePage() {
             let txSignature = 'db-only-' + Date.now();
 
             // Try on-chain transaction (skip if program not deployed)
+            // Try on-chain transaction (skip if program not deployed)
             try {
                 const leagueIdOnChain = parseInt(league.leagueId.replace('league_', ''));
                 console.log("Attempting on-chain join:", leagueIdOnChain);
@@ -67,8 +68,31 @@ export default function JoinLeaguePage() {
                 txSignature = tx;
                 console.log("On-chain transaction successful:", tx);
             } catch (chainError: any) {
-                console.warn("On-chain transaction failed (program may not be deployed):", chainError?.message || chainError);
-                // Continue with DB-only join for hackathon demo
+                console.warn("On-chain program failed, attempting direct SOL transfer fallback:", chainError?.message || chainError);
+
+                // FALLBACK: Direct SOL Transfer
+                try {
+                    const transaction = new Transaction().add(
+                        SystemProgram.transfer({
+                            fromPubkey: wallet.publicKey,
+                            toPubkey: TREASURY_WALLET,
+                            lamports: league.buyIn * 1_000_000_000, // Convert SOL to lamports
+                        })
+                    );
+
+                    const { blockhash } = await connection.getLatestBlockhash();
+                    transaction.recentBlockhash = blockhash;
+                    transaction.feePayer = wallet.publicKey;
+
+                    const signature = await wallet.sendTransaction(transaction, connection);
+                    await connection.confirmTransaction(signature, 'confirmed');
+
+                    txSignature = signature;
+                    console.log("Direct SOL transfer successful:", signature);
+                } catch (transferError) {
+                    console.error("Direct transfer failed:", transferError);
+                    throw new Error("Payment failed. Please try again.");
+                }
             }
 
             // Sync with Backend (always do this)

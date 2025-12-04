@@ -26,7 +26,21 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'League not found' }, { status: 404 });
         }
 
-        // 2. Create PlayerStats entry
+        // 2. Check if player already joined
+        const existingPlayer = await prisma.playerStats.findUnique({
+            where: {
+                leagueId_address: {
+                    leagueId: league.id,
+                    address: player
+                }
+            }
+        });
+
+        if (existingPlayer) {
+            return NextResponse.json({ success: true, playerStats: existingPlayer, message: 'Already joined' });
+        }
+
+        // 3. Create PlayerStats entry
         const playerStats = await prisma.playerStats.create({
             data: {
                 leagueId: league.id, // Internal DB ID
@@ -36,7 +50,7 @@ export async function POST(request: Request) {
             }
         });
 
-        // 3. Update League currentPlayers count
+        // 4. Update League currentPlayers count
         await prisma.league.update({
             where: { id: league.id },
             data: {
