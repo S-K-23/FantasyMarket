@@ -311,13 +311,13 @@ export default function DraftRoomPage() {
 
                             {/* Category Filters */}
                             <div className="flex flex-wrap gap-2 mb-4">
-                                {categories.slice(0, 6).map(cat => (
+                                {categories.slice(0, 6).map((cat, index) => (
                                     <button
-                                        key={cat}
+                                        key={`cat-${index}-${cat}`}
                                         onClick={() => setCategoryFilter(cat)}
                                         className={`px-3 py-1 rounded-full text-xs transition ${categoryFilter === cat
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                                             }`}
                                     >
                                         {cat}
@@ -340,8 +340,8 @@ export default function DraftRoomPage() {
                                                 key={market.id}
                                                 onClick={() => setSelectedMarket(market)}
                                                 className={`p-4 rounded-lg border transition cursor-pointer ${isSelected
-                                                        ? 'bg-blue-900/50 border-blue-500'
-                                                        : 'bg-gray-700/50 border-gray-600 hover:border-gray-500'
+                                                    ? 'bg-blue-900/50 border-blue-500'
+                                                    : 'bg-gray-700/50 border-gray-600 hover:border-gray-500'
                                                     }`}
                                             >
                                                 <div className="flex justify-between items-start mb-2">
@@ -366,10 +366,10 @@ export default function DraftRoomPage() {
                                                                 handleDraftPick(market, 'YES');
                                                             }}
                                                             className={`px-3 py-1 rounded text-xs font-bold transition ${yesDisabled
-                                                                    ? 'bg-green-900/50 text-green-400 cursor-not-allowed'
-                                                                    : !isMyTurn || isDraftComplete
-                                                                        ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                                                        : 'bg-green-600 hover:bg-green-500'
+                                                                ? 'bg-green-900/50 text-green-400 cursor-not-allowed'
+                                                                : !isMyTurn || isDraftComplete
+                                                                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                                                    : 'bg-green-600 hover:bg-green-500'
                                                                 }`}
                                                         >
                                                             {yesDisabled ? '✓ Taken' : 'YES'}
@@ -381,10 +381,10 @@ export default function DraftRoomPage() {
                                                                 handleDraftPick(market, 'NO');
                                                             }}
                                                             className={`px-3 py-1 rounded text-xs font-bold transition ${noDisabled
-                                                                    ? 'bg-red-900/50 text-red-400 cursor-not-allowed'
-                                                                    : !isMyTurn || isDraftComplete
-                                                                        ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                                                        : 'bg-red-600 hover:bg-red-500'
+                                                                ? 'bg-red-900/50 text-red-400 cursor-not-allowed'
+                                                                : !isMyTurn || isDraftComplete
+                                                                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                                                    : 'bg-red-600 hover:bg-red-500'
                                                                 }`}
                                                         >
                                                             {noDisabled ? '✓ Taken' : 'NO'}
@@ -478,10 +478,10 @@ export default function DraftRoomPage() {
                                             <div
                                                 key={address}
                                                 className={`p-3 rounded-lg transition flex justify-between items-center ${isCurrentDrafter
-                                                        ? 'bg-blue-600 ring-2 ring-blue-400'
-                                                        : isMe
-                                                            ? 'bg-purple-900/50 border border-purple-500'
-                                                            : 'bg-gray-700'
+                                                    ? 'bg-blue-600 ring-2 ring-blue-400'
+                                                    : isMe
+                                                        ? 'bg-purple-900/50 border border-purple-500'
+                                                        : 'bg-gray-700'
                                                     }`}
                                             >
                                                 <div>
