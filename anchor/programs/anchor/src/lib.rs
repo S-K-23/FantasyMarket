@@ -3,9 +3,11 @@ use anchor_lang::solana_program::{system_instruction, program::{invoke, invoke_s
 
 pub mod state;
 pub mod errors;
+pub mod instructions;
 
 use state::*;
 use errors::*;
+use instructions::*;
 
 declare_id!("HtJHB7t3esZkEdZhvUHQNYj4RYXrQsGxqzRoyMzmsBJQ");
 
@@ -161,112 +163,27 @@ pub mod anchor {
 
     pub fn resolve_market(
         ctx: Context<ResolveMarket>,
-        _market_id: String,
+        market_id: String,
         outcome: bool,
         final_prob: u32,
     ) -> Result<()> {
-        let draft_pick = &mut ctx.accounts.draft_pick;
-        let player_state = &mut ctx.accounts.player_state;
-        let league = &mut ctx.accounts.league;
-
-        require!(!draft_pick.resolved, FflError::Unauthorized);
-
-        let is_correct = (draft_pick.prediction == Prediction::Yes && outcome) ||
-                         (draft_pick.prediction == Prediction::No && !outcome);
-
-        let p_pred = if draft_pick.prediction == Prediction::Yes {
-            draft_pick.snapshot_odds as f64 / 10000.0
-        } else {
-            1.0 - (draft_pick.snapshot_odds as f64 / 10000.0)
-        };
-
-        let mut points_change: i64 = 0;
-
-        if is_correct {
-            let base = 100.0 * (1.0 - p_pred);
-            let multiplier = if p_pred >= 0.70 { 1.0 } else if p_pred >= 0.40 { 1.2 } else { 1.5 };
-            points_change = (base * multiplier) as i64;
-            
-            if p_pred < 0.20 {
-                points_change += 10;
-                player_state.bonuses += 10;
-            }
-            
-            player_state.streak += 1;
-            if player_state.streak % 5 == 0 {
-                points_change += 25;
-                player_state.bonuses += 25;
-            }
-            
-            let session_idx = draft_pick.session_index as usize;
-            if session_idx < player_state.session_stats.len() {
-                player_state.session_stats[session_idx].wins += 1;
-                if player_state.session_stats[session_idx].wins == league.rounds_per_session {
-                    points_change += 50;
-                    player_state.bonuses += 50;
-                }
-            }
-        } else {
-            points_change = (-30.0 * p_pred) as i64;
-            player_state.streak = 0;
-            let session_idx = draft_pick.session_index as usize;
-            if session_idx < player_state.session_stats.len() {
-                player_state.session_stats[session_idx].losses += 1;
-            }
-        }
-
-        player_state.points += points_change;
-        league.total_points += points_change;
-        
-        draft_pick.resolved = true;
-        draft_pick.final_points = points_change as i32;
-
-        Ok(())
+        instructions::resolve::resolve_market(ctx, market_id, outcome, final_prob)
     }
 
     pub fn end_season(ctx: Context<EndSeason>) -> Result<()> {
-        let league = &mut ctx.accounts.league;
-        league.state = LeagueState::Completed;
-        Ok(())
+        instructions::payout::end_season(ctx)
     }
-    
-    pub fn distribute_payout(ctx: Context<DistributePayout>) -> Result<()> {
-        let league = &ctx.accounts.league;
-        let player_state = &mut ctx.accounts.player_state;
-        
-        require!(league.state == LeagueState::Completed, FflError::SessionNotActive);
-        require!(!player_state.has_claimed, FflError::Unauthorized);
-        
-        let total_prize_pool = league.buy_in_amount * (league.players.len() as u64);
-        let player_points = if player_state.points < 0 { 0 } else { player_state.points as u64 };
-        let total_league_points = if league.total_points < 0 { 0 } else { league.total_points as u64 };
-        
-        let payout = if total_league_points > 0 {
-            (player_points as u128 * total_prize_pool as u128 / total_league_points as u128) as u64
-        } else {
-            total_prize_pool / (league.players.len() as u64)
-        };
-        
-        if payout > 0 {
-            // Transfer from Treasury to Player
-            let ix = system_instruction::transfer(
-                &ctx.accounts.treasury.key(),
-                &ctx.accounts.player.key(),
-                payout,
-            );
-            invoke(
-                &ix,
-                &[
-                    ctx.accounts.treasury.to_account_info(),
-                    ctx.accounts.player.to_account_info(),
-                    ctx.accounts.system_program.to_account_info(),
-                ],
-            )?;
-        }
-        
-        player_state.has_claimed = true;
-        
-        Ok(())
+
+    pub fn claim_payout(ctx: Context<ClaimPayout>) -> Result<()> {
+        instructions::payout::claim_payout(ctx)
+    }
+}
+    pub fn propose_trade(ctx: Context<ProposeTrade>, trade_id: u64) -> Result<()> {
+        instructions::trades::propose_trade(ctx, trade_id)
+    }
+
+    pub fn respond_to_trade(ctx: Context<RespondToTrade>, accept: bool) -> Result<()> {
+        instructions::trades::respond_to_trade(ctx, accept)
     }
 }
 
@@ -351,37 +268,4 @@ pub struct MakePick<'info> {
     pub system_program: Program<'info, System>,
 }
 
-#[derive(Accounts)]
-#[instruction(market_id: String)]
-pub struct ResolveMarket<'info> {
-    #[account(mut)]
-    pub league: Account<'info, League>,
-    #[account(mut)]
-    pub draft_pick: Account<'info, DraftPick>,
-    #[account(mut)]
-    pub player_state: Account<'info, PlayerState>,
-    #[account(mut)]
-    pub signer: Signer<'info>, 
-}
 
-#[derive(Accounts)]
-pub struct EndSeason<'info> {
-    #[account(mut)]
-    pub league: Account<'info, League>,
-    #[account(mut)]
-    pub creator: Signer<'info>,
-}
-
-#[derive(Accounts)]
-pub struct DistributePayout<'info> {
-    #[account(mut)]
-    pub league: Account<'info, League>,
-    #[account(mut)]
-    pub player_state: Account<'info, PlayerState>,
-    #[account(mut)]
-    pub treasury: Signer<'info>,
-    /// CHECK: Recipient
-    #[account(mut)]
-    pub player: AccountInfo<'info>,
-    pub system_program: Program<'info, System>,
-}

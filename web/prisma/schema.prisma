@@ -81,3 +81,18 @@ model DraftPick {
   
   @@unique([leagueId, marketId, prediction])
 }
+model Trade {
+  id            String   @id @default(uuid())
+  tradeId       String   // On-chain Trade ID (u64 as string)
+  leagueId      Int
+  league        League   @relation(fields: [leagueId], references: [id])
+  proposer      String   // Pubkey
+  receiver      String   // Pubkey
+  proposerPick  Int      // DraftPick ID (DB ID)
+  receiverPick  Int      // DraftPick ID (DB ID)
+  status        String   // PENDING, ACCEPTED, REJECTED, EXPIRED, CANCELED
+  createdAt     DateTime @default(now())
+  expiresAt     DateTime
+  
+  @@unique([leagueId, tradeId])
+}

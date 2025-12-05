@@ -1,0 +1,679 @@
+{
+    "version": "0.1.0",
+    "name": "anchor",
+    "instructions": [
+        {
+            "name": "createLeague",
+            "accounts": [
+                {
+                    "name": "league",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "prizePoolVault",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "creator",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "leagueId",
+                    "type": "u64"
+                },
+                {
+                    "name": "buyInAmount",
+                    "type": "u64"
+                },
+                {
+                    "name": "sessionsTotal",
+                    "type": "u8"
+                },
+                {
+                    "name": "roundsPerSession",
+                    "type": "u8"
+                }
+            ]
+        },
+        {
+            "name": "joinLeague",
+            "accounts": [
+                {
+                    "name": "league",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "playerState",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "treasury",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "player",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "startDraft",
+            "accounts": [
+                {
+                    "name": "league",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "creator",
+                    "isMut": true,
+                    "isSigner": true
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "makePick",
+            "accounts": [
+                {
+                    "name": "league",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "draftPick",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "player",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "marketId",
+                    "type": "string"
+                },
+                {
+                    "name": "prediction",
+                    "type": {
+                        "defined": "Prediction"
+                    }
+                },
+                {
+                    "name": "snapshotOdds",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "proposeTrade",
+            "accounts": [
+                {
+                    "name": "league",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "tradeProposal",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "proposer",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "receiver",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "proposerPick",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "receiverPick",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "tradeId",
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "respondToTrade",
+            "accounts": [
+                {
+                    "name": "tradeProposal",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "respondent",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "proposerPick",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "receiverPick",
+                    "isMut": true,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "accept",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "resolveMarket",
+            "accounts": [
+                {
+                    "name": "league",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "draftPick",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "playerState",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "signer",
+                    "isMut": true,
+                    "isSigner": true
+                }
+            ],
+            "args": [
+                {
+                    "name": "marketId",
+                    "type": "string"
+                },
+                {
+                    "name": "outcome",
+                    "type": "bool"
+                },
+                {
+                    "name": "finalProb",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "endSeason",
+            "accounts": [
+                {
+                    "name": "league",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "creator",
+                    "isMut": true,
+                    "isSigner": true
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "claimPayout",
+            "accounts": [
+                {
+                    "name": "league",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "playerState",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "prizePoolVault",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "player",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": []
+        }
+    ],
+    "accounts": [
+        {
+            "name": "League",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "leagueId",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "creator",
+                        "type": "publicKey"
+                    },
+                    {
+                        "name": "buyInAmount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "prizePoolVault",
+                        "type": "publicKey"
+                    },
+                    {
+                        "name": "players",
+                        "type": {
+                            "vec": "publicKey"
+                        }
+                    },
+                    {
+                        "name": "draftOrder",
+                        "type": {
+                            "vec": "publicKey"
+                        }
+                    },
+                    {
+                        "name": "sessionsTotal",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "roundsPerSession",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "currentSession",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "state",
+                        "type": {
+                            "defined": "LeagueState"
+                        }
+                    },
+                    {
+                        "name": "createdAt",
+                        "type": "i64"
+                    },
+                    {
+                        "name": "updatedAt",
+                        "type": "i64"
+                    },
+                    {
+                        "name": "sessionPicksCount",
+                        "type": "u16"
+                    },
+                    {
+                        "name": "totalPoints",
+                        "type": "i64"
+                    },
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "PlayerState",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "leagueId",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "player",
+                        "type": "publicKey"
+                    },
+                    {
+                        "name": "points",
+                        "type": "i64"
+                    },
+                    {
+                        "name": "streak",
+                        "type": "u16"
+                    },
+                    {
+                        "name": "xp",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "bonuses",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "hasClaimed",
+                        "type": "bool"
+                    },
+                    {
+                        "name": "sessionStats",
+                        "type": {
+                            "array": [
+                                {
+                                    "defined": "SessionStat"
+                                },
+                                16
+                            ]
+                        }
+                    },
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "DraftPick",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "leagueId",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "player",
+                        "type": "publicKey"
+                    },
+                    {
+                        "name": "sessionIndex",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "pickIndex",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "marketId",
+                        "type": "string"
+                    },
+                    {
+                        "name": "prediction",
+                        "type": {
+                            "defined": "Prediction"
+                        }
+                    },
+                    {
+                        "name": "snapshotOdds",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "resolved",
+                        "type": "bool"
+                    },
+                    {
+                        "name": "finalPoints",
+                        "type": "i32"
+                    },
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "TradeProposal",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "tradeId",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "leagueId",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "proposer",
+                        "type": "publicKey"
+                    },
+                    {
+                        "name": "receiver",
+                        "type": "publicKey"
+                    },
+                    {
+                        "name": "proposerPick",
+                        "type": "publicKey"
+                    },
+                    {
+                        "name": "receiverPick",
+                        "type": "publicKey"
+                    },
+                    {
+                        "name": "status",
+                        "type": {
+                            "defined": "TradeStatus"
+                        }
+                    },
+                    {
+                        "name": "proposedAt",
+                        "type": "i64"
+                    },
+                    {
+                        "name": "expiresAt",
+                        "type": "i64"
+                    },
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    }
+                ]
+            }
+        }
+    ],
+    "types": [
+        {
+            "name": "LeagueState",
+            "type": {
+                "kind": "enum",
+                "variants": [
+                    {
+                        "name": "Setup"
+                    },
+                    {
+                        "name": "Drafting"
+                    },
+                    {
+                        "name": "Active"
+                    },
+                    {
+                        "name": "Completed"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "SessionStat",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "wins",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "losses",
+                        "type": "u8"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Prediction",
+            "type": {
+                "kind": "enum",
+                "variants": [
+                    {
+                        "name": "Yes"
+                    },
+                    {
+                        "name": "No"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "TradeStatus",
+            "type": {
+                "kind": "enum",
+                "variants": [
+                    {
+                        "name": "Pending"
+                    },
+                    {
+                        "name": "Accepted"
+                    },
+                    {
+                        "name": "Rejected"
+                    },
+                    {
+                        "name": "Expired"
+                    },
+                    {
+                        "name": "Canceled"
+                    }
+                ]
+            }
+        }
+    ],
+    "errors": [
+        {
+            "code": 6000,
+            "name": "LeagueFull",
+            "msg": "League is full"
+        },
+        {
+            "code": 6001,
+            "name": "NotSetup",
+            "msg": "League is not in setup state"
+        },
+        {
+            "code": 6002,
+            "name": "NotDrafting",
+            "msg": "League is not in drafting state"
+        },
+        {
+            "code": 6003,
+            "name": "NotYourTurn",
+            "msg": "Not your turn to pick"
+        },
+        {
+            "code": 6004,
+            "name": "MarketTaken",
+            "msg": "Market already drafted"
+        },
+        {
+            "code": 6005,
+            "name": "SessionNotActive",
+            "msg": "Session not active"
+        },
+        {
+            "code": 6006,
+            "name": "AlreadyJoined",
+            "msg": "Already joined"
+        },
+        {
+            "code": 6007,
+            "name": "InvalidPrediction",
+            "msg": "Invalid prediction"
+        },
+        {
+            "code": 6008,
+            "name": "Unauthorized",
+            "msg": "Unauthorized access"
+        },
+        {
+            "code": 6009,
+            "name": "MathOverflow",
+            "msg": "Math overflow"
+        },
+        {
+            "code": 6010,
+            "name": "TradeNotPending",
+            "msg": "Trade not pending"
+        },
+        {
+            "code": 6011,
+            "name": "TradeExpired",
+            "msg": "Trade expired"
+        },
+        {
+            "code": 6012,
+            "name": "NotTradeParty",
+            "msg": "Not trade party"
+        },
+        {
+            "code": 6013,
+            "name": "PickResolved",
+            "msg": "Pick already resolved"
+        },
+        {
+            "code": 6014,
+            "name": "PickNotFound",
+            "msg": "Pick not found"
+        }
+    ]
+}

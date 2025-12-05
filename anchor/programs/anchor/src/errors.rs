@@ -22,4 +22,14 @@ pub enum FflError {
     Unauthorized,
     #[msg("Math overflow")]
     MathOverflow,
+    #[msg("Trade not pending")]
+    TradeNotPending,
+    #[msg("Trade expired")]
+    TradeExpired,
+    #[msg("Not trade party")]
+    NotTradeParty,
+    #[msg("Pick already resolved")]
+    PickResolved,
+    #[msg("Pick not found")]
+    PickNotFound,
 }

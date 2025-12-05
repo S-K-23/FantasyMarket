@@ -300,6 +300,16 @@ export default function LeagueLobby() {
                         </button>
                     )}
 
+                    {/* Go to Dashboard Button - If active */}
+                    {(league.status === 'ACTIVE' || league.status === 'COMPLETED') && (
+                        <Link
+                            href={`/league/${params.id}/dashboard`}
+                            className="w-full py-4 bg-purple-600 hover:bg-purple-500 rounded-xl text-lg font-bold transition text-center"
+                        >
+                            🏠 Go to Dashboard (Trades & Payouts)
+                        </Link>
+                    )}
+
                     <p className="text-sm text-gray-500 text-center">
                         {league.status === 'SETUP'
                             ? 'Minimum 2 players required to start (8 recommended for best experience)'
