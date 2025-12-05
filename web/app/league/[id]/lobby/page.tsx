@@ -7,6 +7,8 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { QRCodeSVG } from 'qrcode.react';
 import LeaderboardTable from '@/components/league/LeaderboardTable';
 import ActivePicksPanel from '@/components/league/ActivePicksPanel';
+import LobbyNews from '@/components/league/LobbyNews';
+import LobbyAnalytics from '@/components/league/LobbyAnalytics';
 
 interface Player {
     id: number;
@@ -29,6 +31,7 @@ interface League {
     status: string;
     currentSession: number;
     draftOrder: string[];
+    category?: string;
 }
 
 export default function LeagueLobby() {
@@ -39,6 +42,8 @@ export default function LeagueLobby() {
     const [players, setPlayers] = useState<Player[]>([]);
     const [loading, setLoading] = useState(true);
     const [starting, setStarting] = useState(false);
+    const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'news'>('overview');
+
     // Fetch live scores
     const [scores, setScores] = useState<any>(null);
 
@@ -112,18 +117,21 @@ export default function LeagueLobby() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800">
-                <div className="text-white text-xl">Loading Lobby...</div>
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-950">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="text-white text-xl font-light tracking-wider">LOADING LOBBY...</div>
+                </div>
             </div>
         );
     }
 
     if (!league) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-950">
                 <div className="text-center text-white">
-                    <h1 className="text-2xl font-bold mb-4">League Not Found</h1>
-                    <Link href="/" className="text-blue-400 hover:underline">Go Home</Link>
+                    <h1 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-orange-500">League Not Found</h1>
+                    <Link href="/" className="px-6 py-2 bg-gray-800 hover:bg-gray-700 rounded-full transition">Return Home</Link>
                 </div>
             </div>
         );
@@ -133,257 +141,299 @@ export default function LeagueLobby() {
     const isSetup = league.status === 'SETUP';
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
-            <nav className="border-b border-gray-700 bg-gray-900/50 backdrop-blur">
-                <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-                    <Link href="/" className="text-xl font-bold hover:text-blue-400">
-                        🏠 Home
+        <div className="min-h-screen bg-[#0a0b14] text-white selection:bg-blue-500/30">
+            {/* Navbar */}
+            <nav className="border-b border-white/5 bg-gray-900/50 backdrop-blur-md sticky top-0 z-50">
+                <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+                    <Link href="/" className="text-xl font-bold hover:text-blue-400 transition flex items-center gap-2">
+                        <span className="text-2xl">⚡</span> FantasyMarket
                     </Link>
+                    <div className="flex items-center gap-4">
+                        <div className="hidden md:flex items-center gap-2 text-sm text-gray-400 bg-gray-800/50 px-3 py-1.5 rounded-full border border-white/5">
+                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                            Network Active
+                        </div>
+                    </div>
                 </div>
             </nav>
 
-            <div className="container mx-auto px-4 py-8 max-w-6xl">
-                {/* Header */}
-                <div className="flex justify-between items-center mb-8">
-                    <div>
-                        <h1 className="text-4xl font-bold mb-2">{league.name}</h1>
-                        <div className="flex items-center gap-3">
-                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${league.status === 'SETUP' ? 'bg-yellow-600' :
-                                league.status === 'DRAFTING' ? 'bg-blue-600' :
-                                    'bg-green-600'
-                                }`}>
-                                {league.status}
-                            </span>
-                            <span className="text-gray-400">
-                                {league.currentPlayers}/{league.maxPlayers} Players
-                            </span>
-                            <span className="text-green-400 font-bold">
-                                {prizePool} {league.currency} Pool
-                            </span>
+            <div className="container mx-auto px-4 py-8 max-w-7xl">
+                {/* Hero Section */}
+                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-white/10 shadow-2xl mb-8">
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+
+                    <div className="relative p-8 md:p-12">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                            <div>
+                                <div className="flex items-center gap-3 mb-4">
+                                    <span className={`px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase border ${league.status === 'SETUP' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
+                                        league.status === 'DRAFTING' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' :
+                                            'bg-green-500/10 border-green-500/20 text-green-400'
+                                        }`}>
+                                        {league.status}
+                                    </span>
+                                    <span className="px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase bg-gray-700/30 border border-white/5 text-gray-300">
+                                        {league.category || 'General'}
+                                    </span>
+                                </div>
+                                <h1 className="text-5xl md:text-6xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-400">
+                                    {league.name}
+                                </h1>
+                                <div className="flex flex-wrap items-center gap-6 text-gray-400 font-medium">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xl">👥</span>
+                                        {league.currentPlayers}/{league.maxPlayers} Players
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xl">💰</span>
+                                        <span className="text-white font-bold">{prizePool} {league.currency}</span> Prize Pool
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xl">📅</span>
+                                        Session {league.currentSession}/{league.totalSessions}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-col gap-3 min-w-[200px]">
+                                {league.status === 'DRAFTING' && (
+                                    <Link
+                                        href={`/league/${params.id}/draft`}
+                                        className="group relative px-8 py-4 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold text-center transition-all hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25 overflow-hidden"
+                                    >
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                                        <span className="relative flex items-center justify-center gap-2">
+                                            🎯 Enter Draft Room
+                                        </span>
+                                    </Link>
+                                )}
+                                {isCreator && isSetup && (
+                                    <button
+                                        onClick={handleStartDraft}
+                                        disabled={!canStartDraft || starting}
+                                        className={`px-8 py-4 rounded-2xl font-bold text-center transition-all ${canStartDraft && !starting
+                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 hover:scale-105 shadow-lg shadow-blue-900/20'
+                                            : 'bg-gray-800 text-gray-500 cursor-not-allowed border border-white/5'
+                                            }`}
+                                    >
+                                        {starting ? 'Starting Engine...' : '🚀 Start Season'}
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => {
+                                        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+                                        navigator.clipboard.writeText(`${baseUrl}/league/join/${league.leagueId}`);
+                                        alert('Invite link copied!');
+                                    }}
+                                    className="px-8 py-3 bg-gray-800/50 hover:bg-gray-800 border border-white/10 rounded-2xl font-medium text-sm transition text-gray-300 hover:text-white"
+                                >
+                                    🔗 Copy Invite Link
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex gap-3">
-                        {league.status === 'DRAFTING' && (
-                            <Link
-                                href={`/league/${params.id}/draft`}
-                                className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 rounded-xl font-bold transition shadow-lg shadow-green-900/20"
-                            >
-                                🎯 Enter Draft Room
-                            </Link>
-                        )}
-                        {isCreator && isSetup && (
-                            <button
-                                onClick={handleStartDraft}
-                                disabled={!canStartDraft || starting}
-                                className={`px-6 py-3 rounded-xl font-bold transition ${canStartDraft && !starting
-                                    ? 'bg-blue-600 hover:bg-blue-500'
-                                    : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                                    }`}
-                            >
-                                {starting ? 'Starting...' : '🚀 Start Draft'}
-                            </button>
-                        )}
-                    </div>
+                    {/* Tabs */}
+                    {!isSetup && (
+                        <div className="flex items-center gap-1 px-8 pb-0 border-t border-white/5 bg-black/20">
+                            {[
+                                { id: 'overview', label: 'Overview', icon: '📊' },
+                                { id: 'analytics', label: 'Analytics', icon: '📈' },
+                                { id: 'news', label: 'News Feed', icon: '📰' },
+                            ].map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id as any)}
+                                    className={`px-6 py-4 text-sm font-bold border-b-2 transition-colors flex items-center gap-2 ${activeTab === tab.id
+                                        ? 'border-blue-500 text-blue-400 bg-blue-500/5'
+                                        : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'
+                                        }`}
+                                >
+                                    <span>{tab.icon}</span>
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
-                {/* Main Content */}
+                {/* Main Content Grid */}
                 <div className="grid lg:grid-cols-3 gap-8">
 
-                    {/* Left Column: Dashboard / Stats (Span 2) */}
+                    {/* Left Column (Main) */}
                     <div className="lg:col-span-2 space-y-6">
-                        {!isSetup ? (
-                            <>
-                                {/* Game Status Card */}
-                                <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-xl border border-blue-600/30 p-6">
-                                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                        <div>
-                                            <h2 className="text-xl font-bold mb-1">
-                                                {league.status === 'DRAFTING' ? '🎯 Draft in Progress' : '📈 Season Active'}
-                                            </h2>
-                                            <p className="text-gray-400 text-sm">
-                                                Session {league.currentSession} of {league.totalSessions}
-                                            </p>
-                                        </div>
-                                        <div className="flex gap-3 flex-wrap">
-                                            {league.status === 'DRAFTING' && (
-                                                <Link
-                                                    href={`/league/${params.id}/draft`}
-                                                    className="px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 rounded-lg font-bold transition shadow-lg shadow-green-900/30"
-                                                >
-                                                    🎯 Enter Draft Room
-                                                </Link>
-                                            )}
-                                            {league.status === 'ACTIVE' && (
-                                                <Link
-                                                    href={`/league/${params.id}/draft`}
-                                                    className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-lg font-bold transition"
-                                                >
-                                                    📊 Live Dashboard
-                                                </Link>
-                                            )}
-                                            {isCreator && (
-                                                <Link
-                                                    href={`/league/${params.id}/admin`}
-                                                    className="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition"
-                                                >
-                                                    ⚙️ Admin Tools
-                                                </Link>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
 
-                                {/* Live Leaderboard */}
-                                <div className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden">
-                                    <div className="p-6 border-b border-gray-700 flex justify-between items-center">
-                                        <h2 className="text-xl font-bold">🏆 Live Standings</h2>
-                                        <span className="text-xs text-green-400 animate-pulse flex items-center gap-1">
-                                            <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                                            Live Updates
-                                        </span>
-                                    </div>
-                                    {scores?.players && scores.players.length > 0 ? (
-                                        <LeaderboardTable
-                                            players={scores.players}
-                                            currentPlayerAddress={publicKey?.toBase58()}
-                                        />
-                                    ) : (
-                                        <div className="p-8 text-center text-gray-400">
-                                            <p>No scores yet. Complete the draft to see standings!</p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Active Picks */}
-                                {publicKey && (
-                                    <ActivePicksPanel
-                                        leagueId={String(league.id)}
-                                        playerAddress={publicKey.toBase58()}
-                                    />
-                                )}
-                            </>
-                        ) : (
-                            /* Setup State: Show Players List */
-                            <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
-                                <h3 className="font-semibold mb-4 text-lg">
-                                    Joined Players ({players.length}/{league.maxPlayers})
+                        {isSetup ? (
+                            /* Setup State: Player List */
+                            <div className="bg-gray-900/50 backdrop-blur border border-white/10 rounded-3xl p-8">
+                                <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">👥</span>
+                                    Lobby ({players.length}/{league.maxPlayers})
                                 </h3>
-                                {players.length === 0 ? (
-                                    <p className="text-gray-400 text-center py-8">
-                                        Waiting for players to join...
-                                    </p>
-                                ) : (
-                                    <div className="space-y-2">
-                                        {players.map((player, index) => {
-                                            const isMe = publicKey && player.address === publicKey.toBase58();
-                                            return (
-                                                <div key={player.id} className={`flex items-center justify-between p-3 rounded-lg ${isMe ? 'bg-purple-900/30 border border-purple-600' : 'bg-gray-700/50'}`}>
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="text-gray-500 w-6">{index + 1}.</span>
-                                                        <span className="font-mono">{player.address.slice(0, 6)}...{player.address.slice(-4)}</span>
-                                                        {isMe && <span className="text-xs bg-purple-600 px-2 py-0.5 rounded">You</span>}
-                                                        {player.address === league.creator && <span className="text-xs bg-yellow-600 px-2 py-0.5 rounded">Creator</span>}
+
+                                <div className="grid gap-3">
+                                    {players.map((player, index) => {
+                                        const isMe = publicKey && player.address === publicKey.toBase58();
+                                        return (
+                                            <div key={player.id} className={`flex items-center justify-between p-4 rounded-xl border transition-all ${isMe
+                                                ? 'bg-blue-500/10 border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.1)]'
+                                                : 'bg-gray-800/30 border-white/5 hover:bg-gray-800/50'
+                                                }`}>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold text-gray-300">
+                                                        {index + 1}
                                                     </div>
-                                                    <span className="text-green-400 text-sm">✓ Ready</span>
+                                                    <div>
+                                                        <div className="font-mono font-medium text-gray-200">
+                                                            {player.address.slice(0, 6)}...{player.address.slice(-4)}
+                                                        </div>
+                                                        <div className="flex gap-2 mt-1">
+                                                            {isMe && <span className="text-[10px] uppercase font-bold bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">You</span>}
+                                                            {player.address === league.creator && <span className="text-[10px] uppercase font-bold bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">Creator</span>}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            );
-                                        })}
-                                    </div>
-                                )}
+                                                <div className="flex items-center gap-2 text-green-400 bg-green-500/10 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                                                    Ready
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
 
-                                {/* Start Draft Section for Creator */}
-                                {isCreator && (
-                                    <div className="mt-6 pt-6 border-t border-gray-700">
-                                        <button
-                                            onClick={handleStartDraft}
-                                            disabled={!canStartDraft || starting}
-                                            className={`w-full py-4 rounded-xl text-lg font-bold transition ${canStartDraft && !starting
-                                                ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500'
-                                                : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                                                }`}
-                                        >
-                                            {starting
-                                                ? '🔄 Starting Draft...'
-                                                : players.length < 2
-                                                    ? `⏳ Need ${2 - players.length} more player(s)`
-                                                    : '🚀 Start Draft'}
-                                        </button>
-                                        <p className="text-xs text-gray-500 text-center mt-2">
-                                            Minimum 2 players required
-                                        </p>
-                                    </div>
-                                )}
+                                    {/* Empty Slots */}
+                                    {Array.from({ length: Math.max(0, league.maxPlayers - players.length) }).map((_, i) => (
+                                        <div key={`empty-${i}`} className="p-4 rounded-xl border border-dashed border-gray-700 bg-gray-900/20 flex items-center justify-center text-gray-600 font-medium">
+                                            Waiting for player...
+                                        </div>
+                                    ))}
+                                </div>
 
-                                {/* Waiting message for non-creators */}
                                 {!isCreator && players.length >= 2 && (
-                                    <div className="mt-6 pt-6 border-t border-gray-700 text-center">
-                                        <p className="text-gray-400">
-                                            ⏳ Waiting for the league creator to start the draft...
+                                    <div className="mt-8 p-4 bg-blue-900/20 border border-blue-500/20 rounded-xl text-center">
+                                        <p className="text-blue-200 animate-pulse">
+                                            ⏳ Waiting for host to start the draft...
                                         </p>
                                     </div>
                                 )}
                             </div>
+                        ) : (
+                            /* Active/Drafting State Content */
+                            <>
+                                {activeTab === 'overview' && (
+                                    <>
+                                        {/* Live Leaderboard */}
+                                        <div className="bg-gray-900/50 backdrop-blur border border-white/10 rounded-3xl overflow-hidden">
+                                            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
+                                                <h2 className="text-xl font-bold flex items-center gap-2">
+                                                    🏆 Live Standings
+                                                </h2>
+                                                <span className="text-xs font-bold text-green-400 bg-green-500/10 px-3 py-1 rounded-full flex items-center gap-2 border border-green-500/20">
+                                                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                                                    LIVE
+                                                </span>
+                                            </div>
+                                            {scores?.players && scores.players.length > 0 ? (
+                                                <LeaderboardTable
+                                                    players={scores.players}
+                                                    currentPlayerAddress={publicKey?.toBase58()}
+                                                />
+                                            ) : (
+                                                <div className="p-12 text-center text-gray-500 flex flex-col items-center gap-4">
+                                                    <div className="text-4xl">📊</div>
+                                                    <p>Waiting for draft results to populate standings...</p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Active Picks */}
+                                        {publicKey && (
+                                            <ActivePicksPanel
+                                                leagueId={String(league.id)}
+                                                playerAddress={publicKey.toBase58()}
+                                            />
+                                        )}
+                                    </>
+                                )}
+
+                                {activeTab === 'analytics' && (
+                                    <LobbyAnalytics
+                                        players={players}
+                                        prizePool={prizePool}
+                                        currency={league.currency}
+                                    />
+                                )}
+
+                                {activeTab === 'news' && (
+                                    <LobbyNews category={league.category || 'Pop Culture'} />
+                                )}
+                            </>
                         )}
                     </div>
 
-                    {/* Right Column: League Info & Invite */}
+                    {/* Right Column (Sidebar) */}
                     <div className="space-y-6">
-                        {/* Invite Card */}
-                        <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
-                            <h3 className="font-semibold mb-4">Invite Friends</h3>
-                            <div className="bg-gray-900 p-3 rounded-lg font-mono text-xs break-all text-gray-400 mb-3">
-                                {typeof window !== 'undefined'
-                                    ? `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/league/join/${league.leagueId}`
-                                    : '...'}
-                            </div>
-                            <button
-                                onClick={() => {
-                                    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
-                                    navigator.clipboard.writeText(`${baseUrl}/league/join/${league.leagueId}`);
-                                    alert('Copied!');
-                                }}
-                                className="w-full py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition mb-4"
-                            >
-                                📋 Copy Link
-                            </button>
-                            {/* QR Code */}
-                            <div className="flex justify-center bg-white p-4 rounded-lg">
+                        {/* Invite / QR Card - RESTORED/MERGED FEATURE */}
+                        <div className="bg-gray-900/50 backdrop-blur border border-white/10 rounded-3xl p-6">
+                            <h3 className="font-bold text-gray-400 text-sm uppercase tracking-wider mb-4">Invite Friend</h3>
+                            <div className="flex justify-center bg-white p-4 rounded-xl mb-4">
                                 <QRCodeSVG
                                     value={typeof window !== 'undefined'
                                         ? `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/league/join/${league.leagueId}`
                                         : ''}
-                                    size={160}
+                                    size={150}
                                     level="M"
                                     includeMargin={false}
                                 />
                             </div>
-                            <p className="text-center text-xs text-gray-500 mt-2">Scan to join</p>
+                            <p className="text-center text-sm text-gray-400">
+                                Scan to join instantly
+                            </p>
                         </div>
 
-                        {/* League Details */}
-                        <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
-                            <h3 className="font-semibold mb-4">League Settings</h3>
-                            <div className="space-y-3 text-sm text-gray-300">
-                                <div className="flex justify-between">
-                                    <span>Buy-in</span>
-                                    <span className="text-white">{league.buyIn} {league.currency}</span>
+                        {/* League Stats Card */}
+                        <div className="bg-gray-900/50 backdrop-blur border border-white/10 rounded-3xl p-6">
+                            <h3 className="font-bold text-gray-400 text-sm uppercase tracking-wider mb-4">League Settings</h3>
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center p-3 bg-white/5 rounded-xl">
+                                    <span className="text-gray-400 text-sm">Buy-in</span>
+                                    <span className="font-mono font-bold text-blue-400">{league.buyIn} {league.currency}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span>Total Sessions</span>
-                                    <span className="text-white">{league.totalSessions}</span>
+                                <div className="flex justify-between items-center p-3 bg-white/5 rounded-xl">
+                                    <span className="text-gray-400 text-sm">Total Sessions</span>
+                                    <span className="font-mono font-bold">{league.totalSessions}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span>Markets/Session</span>
-                                    <span className="text-white">{league.marketsPerSession}</span>
+                                <div className="flex justify-between items-center p-3 bg-white/5 rounded-xl">
+                                    <span className="text-gray-400 text-sm">Markets/Session</span>
+                                    <span className="font-mono font-bold">{league.marketsPerSession}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span>Current Session</span>
-                                    <span className="text-white">{league.currentSession}</span>
+                                <div className="flex justify-between items-center p-3 bg-white/5 rounded-xl">
+                                    <span className="text-gray-400 text-sm">Category</span>
+                                    <span className="font-medium text-purple-400">{league.category || 'All'}</span>
                                 </div>
                             </div>
                         </div>
+
+                        {/* News Widget (Small) - Only show if not on news tab */}
+                        {activeTab !== 'news' && !isSetup && (
+                            <div className="bg-gray-900/50 backdrop-blur border border-white/10 rounded-3xl overflow-hidden">
+                                <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
+                                    <h3 className="font-bold text-sm uppercase tracking-wider text-gray-400">Latest News</h3>
+                                    <button
+                                        onClick={() => setActiveTab('news')}
+                                        className="text-xs text-blue-400 hover:text-blue-300"
+                                    >
+                                        View All
+                                    </button>
+                                </div>
+                                <div className="max-h-[300px] overflow-hidden relative">
+                                    <LobbyNews category={league.category || 'Pop Culture'} />
+                                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-gray-900 to-transparent pointer-events-none"></div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
