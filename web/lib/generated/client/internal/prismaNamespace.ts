@@ -755,6 +755,7 @@ export const LeagueScalarFieldEnum = {
   currentSession: 'currentSession',
   totalSessions: 'totalSessions',
   marketsPerSession: 'marketsPerSession',
+  category: 'category',
   draftOrder: 'draftOrder',
   createdAt: 'createdAt'
 } as const

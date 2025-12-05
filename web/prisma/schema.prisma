@@ -20,6 +20,7 @@ model League {
   currentSession  Int      @default(1)
   totalSessions   Int
   marketsPerSession Int    @default(5)
+  category        String?  // Market category filter (Sports, Politics, Crypto, etc.)
   draftOrder      String[] @default([]) // Array of player addresses in draft order
   createdAt       DateTime @default(now())
   

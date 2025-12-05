@@ -5,6 +5,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const min_liquidity = Number(searchParams.get('min_liquidity')) || 100;
     const limit = Number(searchParams.get('limit')) || 50;
+    const category = searchParams.get('category') || undefined;
 
     try {
         // Fetch from Gamma API directly
@@ -14,6 +15,7 @@ export async function GET(request: NextRequest) {
             closed: false,
             order: 'liquidity',
             ascending: false,
+            category,
         });
 
         console.log(`Fetched ${markets.length} raw markets from Polymarket`);
@@ -44,10 +46,41 @@ export async function GET(request: NextRequest) {
         const paged = filtered.slice(0, limit);
 
         // Transform to our API format
-        const transformedMarkets = paged.map(m => {
-            // Parse prices - Polymarket typically has [Yes, No] order
-            const priceYes = parseFloat(m.outcomePrices[0] || '0');
-            const priceNo = parseFloat(m.outcomePrices[1] || '0');
+        const transformedMarkets = paged.map((m, idx) => {
+            // Debug logging for first market
+            if (idx === 0) {
+                console.log('Sample market:', {
+                    id: m.id,
+                    question: m.question?.substring(0, 50),
+                    outcomePrices: m.outcomePrices,
+                    outcomePricesType: typeof m.outcomePrices,
+                    isArray: Array.isArray(m.outcomePrices)
+                });
+            }
+
+            // Parse prices - outcomePrices may be a JSON string or array
+            let priceYes = 0;
+            let priceNo = 0;
+
+            if (m.outcomePrices) {
+                let prices: string[] = [];
+
+                // Check if it's a string that needs parsing
+                if (typeof m.outcomePrices === 'string') {
+                    try {
+                        prices = JSON.parse(m.outcomePrices);
+                    } catch (e) {
+                        console.error('Failed to parse outcomePrices string');
+                    }
+                } else if (Array.isArray(m.outcomePrices)) {
+                    prices = m.outcomePrices;
+                }
+
+                if (prices.length >= 2) {
+                    priceYes = parseFloat(String(prices[0] || '0'));
+                    priceNo = parseFloat(String(prices[1] || '0'));
+                }
+            }
 
             // Get token IDs
             const tokenYes = m.clobTokenIds?.[0] || '';

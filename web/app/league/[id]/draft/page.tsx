@@ -3,24 +3,28 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useConnection } from '@solana/wallet-adapter-react';
-import { makePick, PROGRAM_ID } from '@/lib/program';
 
 interface Market {
-    id: string;
-    question: string;
+    market_id: string;
+    title: string;
+    description: string;
     category: string;
-    probability: number;
-    endDate: string;
+    end_date: string;
+    current_price_yes: number;
+    current_price_no: number;
+    liquidity: number;
+    volume: number;
+    polymarket_url: string;
+    outcomes: string[];
+    active: boolean;
+    token_id_yes?: string;
+    token_id_no?: string;
 }
 
 interface Player {
     id: number;
     address: string;
     points: number;
-    streak?: number;
-    rank?: number;
 }
 
 interface DraftPick {
@@ -32,110 +36,90 @@ interface DraftPick {
     session: number;
     pickIndex: number;
     snapshotOdds?: number;
+    marketTitle?: string;
 }
 
 interface League {
     id: number;
     leagueId: string;
     name: string;
-    creator: string;
-    buyIn: number;
+    buyIn: string;
     currency: string;
     maxPlayers: number;
-    currentPlayers: number;
     totalSessions: number;
     marketsPerSession: number;
     status: string;
     currentSession: number;
-    draftOrder: string[];
+    category?: string;
+    players?: Player[];
 }
 
-export default function DraftRoomPage() {
+export default function DraftPage() {
     const params = useParams();
     const router = useRouter();
-    const { publicKey, connected } = useWallet();
-    const wallet = useWallet();
-    const { connection } = useConnection();
-
     const [league, setLeague] = useState<League | null>(null);
     const [markets, setMarkets] = useState<Market[]>([]);
     const [players, setPlayers] = useState<Player[]>([]);
     const [draftPicks, setDraftPicks] = useState<DraftPick[]>([]);
+    const [draftOrder, setDraftOrder] = useState<string[]>([]);
+    const [currentPickIndex, setCurrentPickIndex] = useState(0);
     const [loading, setLoading] = useState(true);
     const [drafting, setDrafting] = useState(false);
     const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [categoryFilter, setCategoryFilter] = useState<string>('All');
-    const [tradeConfig, setTradeConfig] = useState<{ pick: DraftPick | null, isOpen: boolean }>({ pick: null, isOpen: false });
-    const [tradeRecipient, setTradeRecipient] = useState<string>('');
 
-    // Fetch all draft data
-    const fetchDraftData = useCallback(async () => {
+    // Fetch league data
+    useEffect(() => {
         if (!params.id) return;
 
-        try {
-            // Fetch league with draft order
-            const leagueRes = await fetch(`/api/leagues?id=${params.id}`);
-            const leagueData = await leagueRes.json();
-            const leagueInfo = Array.isArray(leagueData) ? leagueData[0] : leagueData;
+        const fetchData = async () => {
+            try {
+                // Fetch league
+                const leagueRes = await fetch(`/api/leagues?id=${params.id}`);
+                const leagueData = await leagueRes.json();
+                const leagueInfo = Array.isArray(leagueData) ? leagueData[0] : leagueData;
+                setLeague(leagueInfo);
 
-            if (!leagueInfo) {
-                setError('League not found');
+                // Fetch players for this league
+                const playersRes = await fetch(`/api/leagues/${params.id}/players`);
+                if (playersRes.ok) {
+                    const playersData = await playersRes.json();
+                    setPlayers(playersData.players || []);
+
+                    // Create draft order (snake draft)
+                    const order = playersData.players?.map((p: Player) => p.address) || [];
+                    setDraftOrder(order);
+                }
+
+                // Fetch existing draft picks
+                const picksRes = await fetch(`/api/draft/picks?leagueId=${params.id}`);
+                if (picksRes.ok) {
+                    const picksData = await picksRes.json();
+                    setDraftPicks(picksData.picks || []);
+                    setCurrentPickIndex(picksData.picks?.length || 0);
+                }
+
+                // Fetch markets
+                const marketsRes = await fetch('/api/markets?limit=30');
+                if (marketsRes.ok) {
+                    const marketsData = await marketsRes.json();
+                    setMarkets(marketsData);
+                }
+
                 setLoading(false);
-                return;
-            }
-
-            setLeague(leagueInfo);
-
-            // Redirect if not in drafting state
-            if (leagueInfo.status === 'SETUP') {
-                setError('Draft has not started yet. Wait for the league creator to start the draft.');
+            } catch (error) {
+                console.error('Failed to fetch data:', error);
                 setLoading(false);
-                return;
             }
+        };
 
-            // Fetch draft picks for current session
-            const picksRes = await fetch(`/api/draft/picks?leagueId=${leagueInfo.id}&session=${leagueInfo.currentSession}`);
-            if (picksRes.ok) {
-                const picksData = await picksRes.json();
-                setDraftPicks(picksData.picks || []);
-            }
-
-            // Fetch markets
-            const marketsRes = await fetch('/api/markets?limit=30');
-            if (marketsRes.ok) {
-                const marketsData = await marketsRes.json();
-                setMarkets(marketsData);
-            }
-
-            // Fetch players for leaderboard
-            const playersRes = await fetch(`/api/leagues/${leagueInfo.id}/players`);
-            if (playersRes.ok) {
-                const playersData = await playersRes.json();
-                setPlayers(playersData.players || []);
-            }
-
-            setLoading(false);
-        } catch (err) {
-            console.error('Failed to fetch draft data:', err);
-            setError('Failed to load draft data');
-            setLoading(false);
-        }
+        fetchData();
     }, [params.id]);
-
-    useEffect(() => {
-        fetchDraftData();
-        // Poll for updates every 5 seconds
-        const interval = setInterval(fetchDraftData, 5000);
-        return () => clearInterval(interval);
-    }, [fetchDraftData]);
 
     // Get current drafter based on snake draft logic
     const getCurrentDrafter = useCallback(() => {
-        if (!league?.draftOrder || league.draftOrder.length === 0) return null;
-
-        const draftOrder = league.draftOrder;
-        const currentPickIndex = draftPicks.length;
+        if (draftOrder.length === 0) return null;
         const round = Math.floor(currentPickIndex / draftOrder.length);
         const positionInRound = currentPickIndex % draftOrder.length;
 
@@ -145,10 +129,7 @@ export default function DraftRoomPage() {
             : draftOrder.length - 1 - positionInRound;
 
         return draftOrder[playerIndex];
-    }, [league?.draftOrder, draftPicks.length]);
-
-    const currentDrafter = getCurrentDrafter();
-    const isMyTurn = connected && publicKey && currentDrafter === publicKey.toBase58();
+    }, [currentPickIndex, draftOrder]);
 
     // Check if a market has already been drafted
     const isMarketDrafted = (marketId: string, prediction: string) => {
@@ -157,63 +138,63 @@ export default function DraftRoomPage() {
         );
     };
 
-    // Calculate expected points for display
-    const calculateExpectedPoints = (probability: number, prediction: 'YES' | 'NO') => {
-        const pPred = prediction === 'YES' ? probability : 1 - probability;
-        const base = 100 * (1 - pPred);
-        const multiplier = pPred >= 0.70 ? 1.0 : pPred >= 0.40 ? 1.2 : 1.5;
-        return Math.round(base * multiplier);
-    };
-
     // Handle draft pick
     const handleDraftPick = async (market: Market, prediction: 'YES' | 'NO') => {
-        if (!connected || !publicKey || !isMyTurn || drafting) return;
+        if (drafting) return;
 
-        if (isMarketDrafted(market.id, prediction)) {
+        const currentDrafter = getCurrentDrafter();
+        if (!currentDrafter) {
+            alert('No players in draft order');
+            return;
+        }
+
+        if (isMarketDrafted(market.market_id, prediction)) {
             alert('This market/prediction combination is already drafted');
             return;
         }
 
         setDrafting(true);
 
+        // Get the odds for the selected prediction (in basis points)
+        const oddsDecimal = prediction === 'YES' ? market.current_price_yes : market.current_price_no;
+        const snapshotOdds = Math.round(oddsDecimal * 10000); // Convert to basis points (e.g., 0.65 -> 6500)
+
         try {
-            // First, record in database
-            const snapshotOdds = Math.round(market.probability * 10000);
             const res = await fetch('/api/draft/pick', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     leagueId: league?.leagueId || params.id,
-                    marketId: market.id,
-                    player: publicKey.toBase58(),
+                    marketId: market.market_id,
+                    marketTitle: market.title,
+                    marketCategory: market.category,
+                    marketEndDate: market.end_date,
+                    player: currentDrafter,
                     prediction,
                     session: league?.currentSession || 1,
-                    pickIndex: draftPicks.length,
-                    snapshotOdds
+                    pickIndex: currentPickIndex,
+                    snapshotOdds,
+                    currentPriceYes: market.current_price_yes,
+                    currentPriceNo: market.current_price_no,
                 })
             });
 
-            if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.error || 'Failed to record pick');
+            if (res.ok) {
+                const data = await res.json();
+                const newPick = {
+                    ...data.pick,
+                    marketTitle: market.title
+                };
+                setDraftPicks(prev => [...prev, newPick]);
+                setCurrentPickIndex(prev => prev + 1);
+                setSelectedMarket(null);
+            } else {
+                const error = await res.json();
+                alert(`Draft failed: ${error.error || 'Unknown error'}`);
             }
-
-            const data = await res.json();
-
-            // Update local state immediately
-            setDraftPicks(prev => [...prev, data.pick]);
-            setSelectedMarket(null);
-
-            // Optional: Trigger on-chain transaction (can be done async)
-            // try {
-            //     await makePick(wallet, connection, league!.id, league!.currentSession, market.id, prediction, snapshotOdds);
-            // } catch (chainError) {
-            //     console.warn('On-chain transaction failed, but DB pick recorded:', chainError);
-            // }
-
-        } catch (err) {
-            console.error('Draft pick error:', err);
-            alert(`Draft failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        } catch (error) {
+            console.error('Draft pick error:', error);
+            alert('Failed to submit draft pick');
         }
 
         setDrafting(false);
@@ -250,41 +231,25 @@ export default function DraftRoomPage() {
         }
     };
 
-    // Calculate progress
-    const totalPicksNeeded = (league?.marketsPerSession || 5) * (league?.draftOrder?.length || 1);
-    const isDraftComplete = draftPicks.length >= totalPicksNeeded;
-    const currentRound = Math.floor(draftPicks.length / Math.max(league?.draftOrder?.length || 1, 1)) + 1;
-    const maxRounds = league?.marketsPerSession || 5;
+    // Format odds as percentage
+    const formatOdds = (odds: number) => {
+        return `${(odds * 100).toFixed(1)}%`;
+    };
 
-    // Get my picks
-    const myPicks = publicKey
-        ? draftPicks.filter(p => p.player === publicKey.toBase58())
-        : [];
+    // Format odds as cents (like Polymarket displays)
+    const formatCents = (odds: number) => {
+        return `${(odds * 100).toFixed(0)}¢`;
+    };
 
-    // Filtered markets
-    const filteredMarkets = categoryFilter === 'All'
-        ? markets
-        : markets.filter(m => m.category === categoryFilter);
-
-    const categories = ['All', ...new Set(markets.map(m => m.category))];
+    // Calculate total picks needed for this session
+    const totalPicksNeeded = (league?.marketsPerSession || 5) * draftOrder.length;
+    const isDraftComplete = currentPickIndex >= totalPicksNeeded;
+    const currentRound = Math.floor(currentPickIndex / Math.max(draftOrder.length, 1)) + 1;
 
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800">
-                <div className="text-white text-xl">Loading Draft Room...</div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800">
-                <div className="text-center text-white">
-                    <h1 className="text-2xl font-bold mb-4">⚠️ {error}</h1>
-                    <Link href={`/league/${params.id}/lobby`} className="text-blue-400 hover:underline">
-                        Back to Lobby
-                    </Link>
-                </div>
+                <div className="text-white text-xl">Loading Draft...</div>
             </div>
         );
     }
@@ -302,289 +267,232 @@ export default function DraftRoomPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
-            {/* Top Bar */}
-            <nav className="border-b border-gray-700 bg-gray-900/80 backdrop-blur sticky top-0 z-50">
-                <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+            {/* Header */}
+            <nav className="border-b border-gray-700 bg-gray-900/50 backdrop-blur">
+                <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+                    <Link href={`/league/${params.id}/lobby`} className="text-xl font-bold hover:text-blue-400">
+                        ← Back to Lobby
+                    </Link>
                     <div className="flex items-center gap-4">
-                        <Link href={`/league/${params.id}/lobby`} className="text-gray-400 hover:text-white">
-                            ← Lobby
-                        </Link>
-                        <div>
-                            <h1 className="font-bold">{league.name}</h1>
-                            <p className="text-xs text-gray-400">Session {league.currentSession} Draft</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="text-right">
-                            <div className="text-sm font-semibold">Round {currentRound} / {maxRounds}</div>
-                            <div className="text-xs text-gray-400">Pick {draftPicks.length + 1} of {totalPicksNeeded}</div>
-                        </div>
-                        {connected && (
-                            <div className="bg-gray-800 px-3 py-1 rounded text-xs font-mono">
-                                {publicKey?.toBase58().slice(0, 4)}...{publicKey?.toBase58().slice(-4)}
-                            </div>
+                        <span className="text-xs text-green-400">● Live Polymarket Odds</span>
+                        {league.category && (
+                            <span className="text-xs bg-blue-600 px-2 py-1 rounded">
+                                {league.category} Markets
+                            </span>
                         )}
                     </div>
                 </div>
             </nav>
 
-            {/* Current Turn Banner */}
-            {!isDraftComplete && (
-                <div className={`py-3 text-center ${isMyTurn ? 'bg-green-600' : 'bg-blue-600'}`}>
-                    {isMyTurn ? (
-                        <span className="font-bold">🎯 It's YOUR turn! Select a market and draft.</span>
-                    ) : (
-                        <span>Waiting for <span className="font-mono">{currentDrafter?.slice(0, 6)}...{currentDrafter?.slice(-4)}</span> to pick</span>
-                    )}
+            <div className="container mx-auto px-4 py-8">
+                {/* Draft Status Banner */}
+                <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 mb-8">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-3xl font-bold">{league.name}</h1>
+                            <p className="text-blue-100">Session {league.currentSession || 1} Draft</p>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-2xl font-bold">
+                                Round {currentRound} / {league.marketsPerSession || 5}
+                            </div>
+                            <div className="text-blue-100">
+                                Pick {currentPickIndex + 1} of {totalPicksNeeded}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            )}
 
-            {isDraftComplete && (
-                <div className="py-4 text-center bg-green-600">
-                    <span className="font-bold text-lg">🎉 Session {league.currentSession} Draft Complete!</span>
-                </div>
-            )}
+                {isDraftComplete && (
+                    <div className="bg-green-600 rounded-xl p-6 mb-8 text-center">
+                        <h2 className="text-2xl font-bold">🎉 Draft Complete!</h2>
+                        <p>All picks have been made for this session.</p>
+                    </div>
+                )}
 
-            <div className="container mx-auto px-4 py-6">
                 <div className="grid lg:grid-cols-4 gap-6">
-                    {/* Left Column: Markets */}
-                    <div className="lg:col-span-2 space-y-4">
-                        <div className="bg-gray-800 rounded-xl p-4">
-                            <h2 className="font-bold text-lg mb-3">Available Markets</h2>
-
-                            {/* Category Filters */}
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {categories.slice(0, 6).map((cat, index) => (
-                                    <button
-                                        key={`cat-${index}-${cat}`}
-                                        onClick={() => setCategoryFilter(cat)}
-                                        className={`px-3 py-1 rounded-full text-xs transition ${categoryFilter === cat
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                                            }`}
-                                    >
-                                        {cat}
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* Markets List */}
-                            <div className="space-y-3 max-h-[500px] overflow-y-auto">
-                                {filteredMarkets.length === 0 ? (
-                                    <p className="text-gray-400 text-center py-8">No markets available</p>
-                                ) : (
-                                    filteredMarkets.map(market => {
-                                        const yesDisabled = isMarketDrafted(market.id, 'YES');
-                                        const noDisabled = isMarketDrafted(market.id, 'NO');
-                                        const isSelected = selectedMarket?.id === market.id;
-
-                                        return (
-                                            <div
-                                                key={market.id}
-                                                onClick={() => setSelectedMarket(market)}
-                                                className={`p-4 rounded-lg border transition cursor-pointer ${isSelected
-                                                    ? 'bg-blue-900/50 border-blue-500'
-                                                    : 'bg-gray-700/50 border-gray-600 hover:border-gray-500'
-                                                    }`}
-                                            >
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <h3 className="font-medium text-sm flex-1 mr-2">
-                                                        {market.question}
-                                                    </h3>
-                                                    <span className="text-xs bg-gray-600 px-2 py-0.5 rounded shrink-0">
-                                                        {market.category}
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between items-center">
-                                                    <div className="text-xs text-gray-400">
-                                                        <span className="text-green-400">YES {(market.probability * 100).toFixed(0)}%</span>
-                                                        <span className="mx-2">|</span>
-                                                        <span className="text-red-400">NO {((1 - market.probability) * 100).toFixed(0)}%</span>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            disabled={yesDisabled || !isMyTurn || isDraftComplete || drafting}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleDraftPick(market, 'YES');
-                                                            }}
-                                                            className={`px-3 py-1 rounded text-xs font-bold transition ${yesDisabled
-                                                                ? 'bg-green-900/50 text-green-400 cursor-not-allowed'
-                                                                : !isMyTurn || isDraftComplete
-                                                                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                                                    : 'bg-green-600 hover:bg-green-500'
-                                                                }`}
-                                                        >
-                                                            {yesDisabled ? '✓ Taken' : 'YES'}
-                                                        </button>
-                                                        <button
-                                                            disabled={noDisabled || !isMyTurn || isDraftComplete || drafting}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleDraftPick(market, 'NO');
-                                                            }}
-                                                            className={`px-3 py-1 rounded text-xs font-bold transition ${noDisabled
-                                                                ? 'bg-red-900/50 text-red-400 cursor-not-allowed'
-                                                                : !isMyTurn || isDraftComplete
-                                                                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                                                    : 'bg-red-600 hover:bg-red-500'
-                                                                }`}
-                                                        >
-                                                            {noDisabled ? '✓ Taken' : 'NO'}
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Center: Selected Market Detail */}
+                    {/* Draft Order Panel */}
                     <div className="lg:col-span-1">
-                        <div className="bg-gray-800 rounded-xl p-4 sticky top-20">
-                            <h2 className="font-bold text-lg mb-3 border-b border-gray-700 pb-2">
-                                {selectedMarket ? 'Market Details' : 'Select a Market'}
-                            </h2>
-                            {selectedMarket ? (
-                                <div className="space-y-4">
-                                    <h3 className="font-medium">{selectedMarket.question}</h3>
-                                    <div className="text-sm text-gray-400">{selectedMarket.category}</div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-green-900/30 p-3 rounded-lg text-center">
-                                            <div className="text-2xl font-bold text-green-400">
-                                                {(selectedMarket.probability * 100).toFixed(1)}%
-                                            </div>
-                                            <div className="text-xs text-gray-400">YES Probability</div>
-                                            <div className="text-xs text-green-400 mt-1">
-                                                +{calculateExpectedPoints(selectedMarket.probability, 'YES')} pts max
-                                            </div>
-                                        </div>
-                                        <div className="bg-red-900/30 p-3 rounded-lg text-center">
-                                            <div className="text-2xl font-bold text-red-400">
-                                                {((1 - selectedMarket.probability) * 100).toFixed(1)}%
-                                            </div>
-                                            <div className="text-xs text-gray-400">NO Probability</div>
-                                            <div className="text-xs text-red-400 mt-1">
-                                                +{calculateExpectedPoints(selectedMarket.probability, 'NO')} pts max
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {isMyTurn && !isDraftComplete && (
-                                        <div className="flex gap-2 pt-2">
-                                            <button
-                                                disabled={isMarketDrafted(selectedMarket.id, 'YES') || drafting}
-                                                onClick={() => handleDraftPick(selectedMarket, 'YES')}
-                                                className="flex-1 py-3 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold"
-                                            >
-                                                {drafting ? 'Drafting...' : 'Draft YES'}
-                                            </button>
-                                            <button
-                                                disabled={isMarketDrafted(selectedMarket.id, 'NO') || drafting}
-                                                onClick={() => handleDraftPick(selectedMarket, 'NO')}
-                                                className="flex-1 py-3 bg-red-600 hover:bg-red-500 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold"
-                                            >
-                                                {drafting ? 'Drafting...' : 'Draft NO'}
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <p className="text-gray-400 text-sm">
-                                    Click on a market to see details and draft options.
-                                </p>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Right Column: Draft Order & My Roster */}
-                    <div className="lg:col-span-1 space-y-4">
-                        {/* Draft Order */}
-                        <div className="bg-gray-800 rounded-xl p-4">
-                            <h2 className="font-bold text-lg mb-3 border-b border-gray-700 pb-2">
+                        <div className="bg-gray-800 rounded-xl p-4 sticky top-4">
+                            <h2 className="font-bold text-lg mb-4 border-b border-gray-700 pb-2">
                                 Draft Order
                             </h2>
                             <div className="space-y-2">
-                                {(!league.draftOrder || league.draftOrder.length === 0) ? (
-                                    <p className="text-gray-400 text-sm">No players in draft</p>
+                                {draftOrder.length === 0 ? (
+                                    <p className="text-gray-400 text-sm">No players yet</p>
                                 ) : (
-                                    league.draftOrder.map((address, index) => {
-                                        const isCurrentDrafter = address === currentDrafter;
-                                        const isMe = publicKey && address === publicKey.toBase58();
+                                    draftOrder.map((address, index) => {
+                                        const isCurrentDrafter = address === getCurrentDrafter();
                                         const playerPicks = draftPicks.filter(p => p.player === address);
+                                        const maxPicks = league.marketsPerSession || 5;
+                                        const isMaxed = playerPicks.length >= maxPicks;
 
                                         return (
                                             <div
                                                 key={address}
-                                                className={`p-3 rounded-lg transition flex justify-between items-center ${isCurrentDrafter
+                                                className={`p-3 rounded-lg transition ${isCurrentDrafter
                                                     ? 'bg-blue-600 ring-2 ring-blue-400'
-                                                    : isMe
-                                                        ? 'bg-purple-900/50 border border-purple-500'
+                                                    : isMaxed
+                                                        ? 'bg-gray-700/50 opacity-50'
                                                         : 'bg-gray-700'
                                                     }`}
                                             >
-                                                <div>
+                                                <div className="flex justify-between items-center">
                                                     <span className="font-mono text-sm">
                                                         {address.slice(0, 6)}...{address.slice(-4)}
                                                     </span>
-                                                    {isMe && <span className="ml-2 text-xs text-purple-300">(You)</span>}
-                                                    {isCurrentDrafter && !isDraftComplete && (
-                                                        <div className="text-xs text-blue-200 mt-1">⏰ On the clock</div>
-                                                    )}
+                                                    <span className={`text-xs ${isMaxed ? 'text-green-400' : 'text-gray-300'}`}>
+                                                        {playerPicks.length}/{maxPicks}
+                                                        {isMaxed && ' ✓'}
+                                                    </span>
                                                 </div>
-                                                <span className="text-sm text-gray-300">
-                                                    {playerPicks.length}/{league.marketsPerSession || 5}
-                                                </span>
+                                                {isCurrentDrafter && !isDraftComplete && (
+                                                    <div className="text-xs text-blue-200 mt-1">
+                                                        ⏰ On the clock
+                                                    </div>
+                                                )}
                                             </div>
                                         );
                                     })
                                 )}
                             </div>
                         </div>
+                    </div>
 
-                        {/* My Roster */}
+                    {/* Markets Panel */}
+                    <div className="lg:col-span-2">
                         <div className="bg-gray-800 rounded-xl p-4">
-                            <h2 className="font-bold text-lg mb-3 border-b border-gray-700 pb-2">
-                                My Picks ({myPicks.length}/{league.marketsPerSession || 5})
+                            <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                                <h2 className="font-bold text-lg">
+                                    Available Markets ({markets.length})
+                                </h2>
+                                <span className="text-xs text-green-400">● Live Odds</span>
+                            </div>
+                            {markets.length === 0 ? (
+                                <p className="text-gray-400 text-center py-8">
+                                    No markets available. Check API connection.
+                                </p>
+                            ) : (
+                                <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                                    {markets.map(market => {
+                                        const yesDisabled = isMarketDrafted(market.market_id, 'YES');
+                                        const noDisabled = isMarketDrafted(market.market_id, 'NO');
+                                        const isSelected = selectedMarket?.market_id === market.market_id;
+
+                                        return (
+                                            <div
+                                                key={market.market_id}
+                                                className={`p-4 rounded-lg border transition cursor-pointer ${isSelected
+                                                    ? 'bg-blue-900/50 border-blue-500'
+                                                    : 'bg-gray-700/50 border-gray-600 hover:border-gray-500'
+                                                    }`}
+                                                onClick={() => setSelectedMarket(market)}
+                                            >
+                                                <div className="flex justify-between items-start mb-3">
+                                                    <h3 className="font-medium text-sm flex-1 mr-2">
+                                                        {market.title}
+                                                    </h3>
+                                                    <span className="text-xs bg-gray-600 px-2 py-1 rounded whitespace-nowrap">
+                                                        {market.category}
+                                                    </span>
+                                                </div>
+
+                                                {/* Odds Display - Like Polymarket */}
+                                                <div className="grid grid-cols-2 gap-3 mb-3">
+                                                    <div className={`p-2 rounded-lg text-center ${yesDisabled ? 'bg-gray-600/50' : 'bg-green-900/30 border border-green-700'
+                                                        }`}>
+                                                        <div className="text-xs text-gray-400 mb-1">YES</div>
+                                                        <div className={`text-lg font-bold ${yesDisabled ? 'text-gray-500' : 'text-green-400'}`}>
+                                                            {formatCents(market.current_price_yes)}
+                                                        </div>
+                                                        <div className="text-xs text-gray-500">
+                                                            {formatOdds(market.current_price_yes)}
+                                                        </div>
+                                                    </div>
+                                                    <div className={`p-2 rounded-lg text-center ${noDisabled ? 'bg-gray-600/50' : 'bg-red-900/30 border border-red-700'
+                                                        }`}>
+                                                        <div className="text-xs text-gray-400 mb-1">NO</div>
+                                                        <div className={`text-lg font-bold ${noDisabled ? 'text-gray-500' : 'text-red-400'}`}>
+                                                            {formatCents(market.current_price_no)}
+                                                        </div>
+                                                        <div className="text-xs text-gray-500">
+                                                            {formatOdds(market.current_price_no)}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Action Buttons */}
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        disabled={yesDisabled || isDraftComplete || drafting || draftOrder.length === 0}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDraftPick(market, 'YES');
+                                                        }}
+                                                        className={`flex-1 px-3 py-2 rounded text-sm font-bold transition ${yesDisabled || isDraftComplete || draftOrder.length === 0
+                                                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                                            : 'bg-green-600 hover:bg-green-500'
+                                                            }`}
+                                                    >
+                                                        {yesDisabled ? '✓ YES Drafted' : `Draft YES @ ${formatCents(market.current_price_yes)}`}
+                                                    </button>
+                                                    <button
+                                                        disabled={noDisabled || isDraftComplete || drafting || draftOrder.length === 0}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDraftPick(market, 'NO');
+                                                        }}
+                                                        className={`flex-1 px-3 py-2 rounded text-sm font-bold transition ${noDisabled || isDraftComplete || draftOrder.length === 0
+                                                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                                            : 'bg-red-600 hover:bg-red-500'
+                                                            }`}
+                                                    >
+                                                        {noDisabled ? '✓ NO Drafted' : `Draft NO @ ${formatCents(market.current_price_no)}`}
+                                                    </button>
+                                                </div>
+
+                                                {/* Market Meta */}
+                                                <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
+                                                    <span>Vol: ${(market.volume / 1000).toFixed(0)}k</span>
+                                                    <span>Ends: {new Date(market.end_date).toLocaleDateString()}</span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Picks History Panel */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-gray-800 rounded-xl p-4 sticky top-4">
+                            <h2 className="font-bold text-lg mb-4 border-b border-gray-700 pb-2">
+                                Draft History ({draftPicks.length})
                             </h2>
-                            <div className="space-y-2">
-                                {myPicks.length === 0 ? (
+                            <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                                {draftPicks.length === 0 ? (
                                     <p className="text-gray-400 text-sm text-center py-4">
                                         No picks yet
                                     </p>
                                 ) : (
-                                    myPicks.map((pick) => {
-                                        const market = markets.find(m => m.id === pick.marketId);
-                                        return (
-                                            <div key={pick.id} className="p-2 bg-gray-700/50 rounded text-sm">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-gray-300 truncate flex-1 mr-2" title={market?.question || pick.marketId}>
-                                                        {market ? market.question : pick.marketId.slice(0, 20) + '...'}
-                                                    </span>
-                                                    <span className={`px-2 py-0.5 rounded font-bold text-xs ${pick.prediction === 'YES' ? 'bg-green-600' : 'bg-red-600'
-                                                        }`}>
-                                                        {pick.prediction}
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between items-center mt-2">
-                                                    {pick.snapshotOdds && (
-                                                        <div className="text-xs text-gray-400">
-                                                            Drafted at {(pick.snapshotOdds / 100).toFixed(0)}%
-                                                        </div>
-                                                    )}
-                                                    <button
-                                                        onClick={() => setTradeConfig({ pick, isOpen: true })}
-                                                        className="text-xs bg-blue-600 hover:bg-blue-500 px-2 py-1 rounded transition"
-                                                    >
-                                                        Trade
-                                                    </button>
+                                    myPicks.map((pick) => (
+                                        <div key={pick.id} className="p-2 bg-gray-700/50 rounded text-sm">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-gray-300 truncate flex-1 mr-2">
+                                                    {pick.marketId.slice(0, 20)}...
+                                                </span>
+                                                <span className={`px-2 py-0.5 rounded font-bold text-xs ${pick.prediction === 'YES' ? 'bg-green-600' : 'bg-red-600'
+                                                    }`}>
+                                                    {pick.prediction}
+                                                </span>
+                                            </div>
+                                            {pick.snapshotOdds && (
+                                                <div className="text-xs text-gray-400 mt-1">
+                                                    Drafted at {(pick.snapshotOdds / 100).toFixed(0)}%
                                                 </div>
                                             </div>
-                                        );
+                                    );
                                     })
                                 )}
                                 {/* Placeholder slots */}
@@ -593,47 +501,6 @@ export default function DraftRoomPage() {
                                         Pick {myPicks.length + i + 1}
                                     </div>
                                 ))}
-                            </div>
-                        </div>
-
-                        {/* Leaderboard */}
-                        <div className="bg-gray-800 rounded-xl p-4">
-                            <h2 className="font-bold text-lg mb-3 border-b border-gray-700 pb-2">
-                                Leaderboard
-                            </h2>
-                            <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                                {players.length === 0 ? (
-                                    <p className="text-gray-400 text-sm text-center py-4">No players yet</p>
-                                ) : (
-                                    players
-                                        .sort((a, b) => b.points - a.points)
-                                        .map((player, index) => {
-                                            const isMe = publicKey && player.address === publicKey.toBase58();
-                                            return (
-                                                <div
-                                                    key={player.id}
-                                                    className={`p-2 rounded flex justify-between items-center ${isMe ? 'bg-purple-900/30 border border-purple-600' : 'bg-gray-700/30'
-                                                        }`}
-                                                >
-                                                    <div className="flex items-center gap-2">
-                                                        <span className={`text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full ${index === 0 ? 'bg-yellow-500 text-black' :
-                                                            index === 1 ? 'bg-gray-400 text-black' :
-                                                                index === 2 ? 'bg-orange-700 text-white' :
-                                                                    'bg-gray-600 text-gray-300'
-                                                            }`}>
-                                                            {index + 1}
-                                                        </span>
-                                                        <span className="font-mono text-xs">
-                                                            {player.address.slice(0, 6)}...
-                                                        </span>
-                                                    </div>
-                                                    <span className="font-bold text-sm text-green-400">
-                                                        {player.points} pts
-                                                    </span>
-                                                </div>
-                                            );
-                                        })
-                                )}
                             </div>
                         </div>
 
