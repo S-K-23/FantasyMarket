@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 interface Market {
     market_id: string;
@@ -68,54 +69,59 @@ export default function DraftPage() {
     const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [categoryFilter, setCategoryFilter] = useState<string>('All');
+    const { publicKey } = useWallet();
+    const [tradeConfig, setTradeConfig] = useState<{ pick: DraftPick | null, isOpen: boolean }>({ pick: null, isOpen: false });
+    const [tradeRecipient, setTradeRecipient] = useState('');
+
+    const fetchDraftData = useCallback(async () => {
+        if (!params.id) return;
+
+        try {
+            // Fetch league
+            const leagueRes = await fetch(`/api/leagues?id=${params.id}`);
+            const leagueData = await leagueRes.json();
+            const leagueInfo = Array.isArray(leagueData) ? leagueData[0] : leagueData;
+            setLeague(leagueInfo);
+
+            // Fetch players for this league
+            const playersRes = await fetch(`/api/leagues/${params.id}/players`);
+            if (playersRes.ok) {
+                const playersData = await playersRes.json();
+                setPlayers(playersData.players || []);
+
+                // Create draft order (snake draft)
+                const order = playersData.players?.map((p: Player) => p.address) || [];
+                setDraftOrder(order);
+            }
+
+            // Fetch existing draft picks
+            const picksRes = await fetch(`/api/draft/picks?leagueId=${params.id}`);
+            if (picksRes.ok) {
+                const picksData = await picksRes.json();
+                setDraftPicks(picksData.picks || []);
+                setCurrentPickIndex(picksData.picks?.length || 0);
+            }
+
+            // Fetch markets
+            const marketsRes = await fetch('/api/markets?limit=30');
+            if (marketsRes.ok) {
+                const marketsData = await marketsRes.json();
+                setMarkets(marketsData);
+            }
+
+            setLoading(false);
+        } catch (error) {
+            console.error('Failed to fetch data:', error);
+            setLoading(false);
+        }
+    }, [params.id]);
 
     // Fetch league data
     useEffect(() => {
-        if (!params.id) return;
+        fetchDraftData();
+    }, [fetchDraftData]);
 
-        const fetchData = async () => {
-            try {
-                // Fetch league
-                const leagueRes = await fetch(`/api/leagues?id=${params.id}`);
-                const leagueData = await leagueRes.json();
-                const leagueInfo = Array.isArray(leagueData) ? leagueData[0] : leagueData;
-                setLeague(leagueInfo);
-
-                // Fetch players for this league
-                const playersRes = await fetch(`/api/leagues/${params.id}/players`);
-                if (playersRes.ok) {
-                    const playersData = await playersRes.json();
-                    setPlayers(playersData.players || []);
-
-                    // Create draft order (snake draft)
-                    const order = playersData.players?.map((p: Player) => p.address) || [];
-                    setDraftOrder(order);
-                }
-
-                // Fetch existing draft picks
-                const picksRes = await fetch(`/api/draft/picks?leagueId=${params.id}`);
-                if (picksRes.ok) {
-                    const picksData = await picksRes.json();
-                    setDraftPicks(picksData.picks || []);
-                    setCurrentPickIndex(picksData.picks?.length || 0);
-                }
-
-                // Fetch markets
-                const marketsRes = await fetch('/api/markets?limit=30');
-                if (marketsRes.ok) {
-                    const marketsData = await marketsRes.json();
-                    setMarkets(marketsData);
-                }
-
-                setLoading(false);
-            } catch (error) {
-                console.error('Failed to fetch data:', error);
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [params.id]);
+    const myPicks = draftPicks.filter(p => p.player === publicKey?.toBase58());
 
     // Get current drafter based on snake draft logic
     const getCurrentDrafter = useCallback(() => {
@@ -191,6 +197,8 @@ export default function DraftPage() {
             } else {
                 const error = await res.json();
                 alert(`Draft failed: ${error.error || 'Unknown error'}`);
+                // Refresh data in case of sync error or out-of-turn
+                fetchDraftData();
             }
         } catch (error) {
             console.error('Draft pick error:', error);
@@ -374,14 +382,14 @@ export default function DraftPage() {
                                 </p>
                             ) : (
                                 <div className="space-y-3 max-h-[600px] overflow-y-auto">
-                                    {markets.map(market => {
+                                    {markets.map((market, index) => {
                                         const yesDisabled = isMarketDrafted(market.market_id, 'YES');
                                         const noDisabled = isMarketDrafted(market.market_id, 'NO');
                                         const isSelected = selectedMarket?.market_id === market.market_id;
 
                                         return (
                                             <div
-                                                key={market.market_id}
+                                                key={`${market.market_id}-${index}`}
                                                 className={`p-4 rounded-lg border transition cursor-pointer ${isSelected
                                                     ? 'bg-blue-900/50 border-blue-500'
                                                     : 'bg-gray-700/50 border-gray-600 hover:border-gray-500'
@@ -491,9 +499,9 @@ export default function DraftPage() {
                                                 <div className="text-xs text-gray-400 mt-1">
                                                     Drafted at {(pick.snapshotOdds / 100).toFixed(0)}%
                                                 </div>
-                                            </div>
-                                    );
-                                    })
+                                            )}
+                                        </div>
+                                    ))
                                 )}
                                 {/* Placeholder slots */}
                                 {Array.from({ length: Math.max(0, (league.marketsPerSession || 5) - myPicks.length) }).map((_, i) => (
