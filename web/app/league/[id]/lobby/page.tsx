@@ -164,6 +164,12 @@ export default function LeagueLobby() {
 
                     {/* Action Buttons */}
                     <div className="flex gap-3">
+                        <Link
+                            href={`/league/${params.id}/mock-draft`}
+                            className="px-6 py-3 bg-purple-600 hover:bg-purple-500 rounded-xl font-bold transition shadow-lg shadow-purple-900/20"
+                        >
+                            🧪 Mock Draft
+                        </Link>
                         {league.status === 'DRAFTING' && (
                             <Link
                                 href={`/league/${params.id}/draft`}
