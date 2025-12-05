@@ -53,7 +53,7 @@ export default function ActivePicksPanel({ leagueId, playerAddress }: { leagueId
     }, [leagueId, playerAddress]);
 
     if (loading) return <div className="animate-pulse h-48 bg-gray-800 rounded-xl"></div>;
-    if (!data) return null;
+    if (!data || !data.by_session) return null;
 
     const sessions = Object.keys(data.by_session).sort((a, b) => Number(b) - Number(a)); // Newest first
 
