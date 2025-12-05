@@ -45,12 +45,10 @@ Fantasy Forecast League transforms prediction markets into season-long fantasy c
 - Next.js API Routes
 - PostgreSQL
 - Polymarket Gamma API
-- Vercel Cron Jobs
 
 **Smart Contracts:**
 - Anchor 0.28+
 - SPL Token Program
-- Metaplex (compressed NFTs)
 
 ## Architecture
 ```
@@ -250,13 +248,3 @@ Set up in `vercel.json`:
 - [ ] Multi-outcome markets
 - [ ] Cross-chain USDC via Circle CCTP
 - [ ] DAO governance for rule changes
-
-## License
-
-MIT
-
-## Contact
-
-- Twitter: @FantasyForecast
-- Discord: [Join our server]
-- Email: team@fantasyforecast.xyz
