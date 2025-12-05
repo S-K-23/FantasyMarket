@@ -197,25 +197,74 @@ export default function LeagueLobby() {
                 <div className="grid lg:grid-cols-3 gap-8">
 
                     {/* Left Column: Dashboard / Stats (Span 2) */}
-                    <div className="lg:col-span-2 space-y-8">
+                    <div className="lg:col-span-2 space-y-6">
                         {!isSetup ? (
                             <>
+                                {/* Game Status Card */}
+                                <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-xl border border-blue-600/30 p-6">
+                                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                        <div>
+                                            <h2 className="text-xl font-bold mb-1">
+                                                {league.status === 'DRAFTING' ? '🎯 Draft in Progress' : '📈 Season Active'}
+                                            </h2>
+                                            <p className="text-gray-400 text-sm">
+                                                Session {league.currentSession} of {league.totalSessions}
+                                            </p>
+                                        </div>
+                                        <div className="flex gap-3 flex-wrap">
+                                            {league.status === 'DRAFTING' && (
+                                                <Link
+                                                    href={`/league/${params.id}/draft`}
+                                                    className="px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 rounded-lg font-bold transition shadow-lg shadow-green-900/30"
+                                                >
+                                                    🎯 Enter Draft Room
+                                                </Link>
+                                            )}
+                                            {league.status === 'ACTIVE' && (
+                                                <Link
+                                                    href={`/league/${params.id}/draft`}
+                                                    className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-lg font-bold transition"
+                                                >
+                                                    📊 Live Dashboard
+                                                </Link>
+                                            )}
+                                            {isCreator && (
+                                                <Link
+                                                    href={`/league/${params.id}/admin`}
+                                                    className="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition"
+                                                >
+                                                    ⚙️ Admin Tools
+                                                </Link>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {/* Live Leaderboard */}
                                 <div className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden">
                                     <div className="p-6 border-b border-gray-700 flex justify-between items-center">
                                         <h2 className="text-xl font-bold">🏆 Live Standings</h2>
-                                        <span className="text-xs text-gray-400 animate-pulse">● Live Updates</span>
+                                        <span className="text-xs text-green-400 animate-pulse flex items-center gap-1">
+                                            <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                                            Live Updates
+                                        </span>
                                     </div>
-                                    <LeaderboardTable
-                                        players={scores?.players || []}
-                                        currentPlayerAddress={publicKey?.toBase58()}
-                                    />
+                                    {scores?.players && scores.players.length > 0 ? (
+                                        <LeaderboardTable
+                                            players={scores.players}
+                                            currentPlayerAddress={publicKey?.toBase58()}
+                                        />
+                                    ) : (
+                                        <div className="p-8 text-center text-gray-400">
+                                            <p>No scores yet. Complete the draft to see standings!</p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Active Picks */}
                                 {publicKey && (
                                     <ActivePicksPanel
-                                        leagueId={params.id as string}
+                                        leagueId={String(league.id)}
                                         playerAddress={publicKey.toBase58()}
                                     />
                                 )}
@@ -246,6 +295,38 @@ export default function LeagueLobby() {
                                                 </div>
                                             );
                                         })}
+                                    </div>
+                                )}
+
+                                {/* Start Draft Section for Creator */}
+                                {isCreator && (
+                                    <div className="mt-6 pt-6 border-t border-gray-700">
+                                        <button
+                                            onClick={handleStartDraft}
+                                            disabled={!canStartDraft || starting}
+                                            className={`w-full py-4 rounded-xl text-lg font-bold transition ${canStartDraft && !starting
+                                                ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500'
+                                                : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                                                }`}
+                                        >
+                                            {starting
+                                                ? '🔄 Starting Draft...'
+                                                : players.length < 2
+                                                    ? `⏳ Need ${2 - players.length} more player(s)`
+                                                    : '🚀 Start Draft'}
+                                        </button>
+                                        <p className="text-xs text-gray-500 text-center mt-2">
+                                            Minimum 2 players required
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* Waiting message for non-creators */}
+                                {!isCreator && players.length >= 2 && (
+                                    <div className="mt-6 pt-6 border-t border-gray-700 text-center">
+                                        <p className="text-gray-400">
+                                            ⏳ Waiting for the league creator to start the draft...
+                                        </p>
                                     </div>
                                 )}
                             </div>
