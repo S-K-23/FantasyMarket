@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { QRCodeSVG } from 'qrcode.react';
 import LeaderboardTable from '@/components/league/LeaderboardTable';
 import ActivePicksPanel from '@/components/league/ActivePicksPanel';
 
@@ -343,10 +344,22 @@ export default function LeagueLobby() {
                                     navigator.clipboard.writeText(`${baseUrl}/league/join/${league.leagueId}`);
                                     alert('Copied!');
                                 }}
-                                className="w-full py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition"
+                                className="w-full py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition mb-4"
                             >
                                 📋 Copy Link
                             </button>
+                            {/* QR Code */}
+                            <div className="flex justify-center bg-white p-4 rounded-lg">
+                                <QRCodeSVG
+                                    value={typeof window !== 'undefined'
+                                        ? `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/league/join/${league.leagueId}`
+                                        : ''}
+                                    size={160}
+                                    level="M"
+                                    includeMargin={false}
+                                />
+                            </div>
+                            <p className="text-center text-xs text-gray-500 mt-2">Scan to join</p>
                         </div>
 
                         {/* League Details */}

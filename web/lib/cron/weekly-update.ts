@@ -1,8 +1,21 @@
 import { prisma } from '@/lib/prisma';
-import { Connection, Keypair, PublicKey } from '@solana/web3.js';
-import { Program, AnchorProvider, Wallet, Idl, BN } from '@coral-xyz/anchor';
+import { Connection, Keypair, PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
+import { Program, AnchorProvider, Idl, BN } from '@coral-xyz/anchor';
 // @ts-ignore
 import idl from '@/lib/idl.json';
+
+// Simple Wallet implementation for backend use
+class NodeWallet {
+    constructor(readonly payer: Keypair) { }
+    get publicKey(): PublicKey { return this.payer.publicKey; }
+    async signTransaction<T extends Transaction | VersionedTransaction>(tx: T): Promise<T> {
+        if (tx instanceof Transaction) { tx.partialSign(this.payer); }
+        return tx;
+    }
+    async signAllTransactions<T extends Transaction | VersionedTransaction>(txs: T[]): Promise<T[]> {
+        return txs.map((tx) => { if (tx instanceof Transaction) tx.partialSign(this.payer); return tx; });
+    }
+}
 
 // Polymarket Gamma API
 const GAMMA_API = 'https://gamma-api.polymarket.com/markets';
@@ -42,7 +55,7 @@ export async function runWeeklyUpdate() {
     }
 
     const walletKey = Uint8Array.from(JSON.parse(process.env.BACKEND_WALLET_KEY));
-    const wallet = new Wallet(Keypair.fromSecretKey(walletKey));
+    const wallet = new NodeWallet(Keypair.fromSecretKey(walletKey));
     const provider = new AnchorProvider(connection, wallet, {});
     const programId = new PublicKey(process.env.NEXT_PUBLIC_PROGRAM_ID!);
     // @ts-ignore
