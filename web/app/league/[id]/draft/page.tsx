@@ -280,9 +280,17 @@ export default function DraftPage() {
                 </div>
 
                 {isDraftComplete && (
-                    <div className="bg-green-600 rounded-xl p-6 mb-8 text-center">
-                        <h2 className="text-2xl font-bold">🎉 Draft Complete!</h2>
-                        <p>All picks have been made for this session.</p>
+                    <div className="bg-green-600 rounded-xl p-6 mb-8">
+                        <div className="text-center mb-4">
+                            <h2 className="text-2xl font-bold">🎉 Draft Complete!</h2>
+                            <p className="text-green-100 mt-2">All picks have been made for this session.</p>
+                        </div>
+                        <Link
+                            href={`/league/${params.id}/dashboard`}
+                            className="block w-full py-3 bg-white text-green-600 hover:bg-green-50 rounded-lg font-bold text-center transition"
+                        >
+                            📊 View Live Scores & Leaderboard →
+                        </Link>
                     </div>
                 )}
 
@@ -307,10 +315,10 @@ export default function DraftPage() {
                                             <div
                                                 key={address}
                                                 className={`p-3 rounded-lg transition ${isCurrentDrafter
-                                                        ? 'bg-blue-600 ring-2 ring-blue-400'
-                                                        : isMaxed
-                                                            ? 'bg-gray-700/50 opacity-50'
-                                                            : 'bg-gray-700'
+                                                    ? 'bg-blue-600 ring-2 ring-blue-400'
+                                                    : isMaxed
+                                                        ? 'bg-gray-700/50 opacity-50'
+                                                        : 'bg-gray-700'
                                                     }`}
                                             >
                                                 <div className="flex justify-between items-center">
@@ -406,8 +414,8 @@ export default function DraftPage() {
                                                             handleDraftPick(market, 'YES');
                                                         }}
                                                         className={`flex-1 px-3 py-2 rounded text-sm font-bold transition ${yesDisabled || isDraftComplete || draftOrder.length === 0
-                                                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                                                : 'bg-green-600 hover:bg-green-500'
+                                                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                                            : 'bg-green-600 hover:bg-green-500'
                                                             }`}
                                                     >
                                                         {yesDisabled ? '✓ YES Drafted' : `Draft YES @ ${formatCents(market.current_price_yes)}`}
@@ -419,8 +427,8 @@ export default function DraftPage() {
                                                             handleDraftPick(market, 'NO');
                                                         }}
                                                         className={`flex-1 px-3 py-2 rounded text-sm font-bold transition ${noDisabled || isDraftComplete || draftOrder.length === 0
-                                                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                                                : 'bg-red-600 hover:bg-red-500'
+                                                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                                            : 'bg-red-600 hover:bg-red-500'
                                                             }`}
                                                     >
                                                         {noDisabled ? '✓ NO Drafted' : `Draft NO @ ${formatCents(market.current_price_no)}`}

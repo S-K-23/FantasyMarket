@@ -54,7 +54,8 @@ export const ModelName = {
   League: 'League',
   PlayerStats: 'PlayerStats',
   Market: 'Market',
-  DraftPick: 'DraftPick'
+  DraftPick: 'DraftPick',
+  LeagueSession: 'LeagueSession'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -100,7 +101,8 @@ export const PlayerStatsScalarFieldEnum = {
   address: 'address',
   points: 'points',
   streak: 'streak',
-  rank: 'rank'
+  rank: 'rank',
+  bonuses: 'bonuses'
 } as const
 
 export type PlayerStatsScalarFieldEnum = (typeof PlayerStatsScalarFieldEnum)[keyof typeof PlayerStatsScalarFieldEnum]
@@ -146,12 +148,32 @@ export const DraftPickScalarFieldEnum = {
 export type DraftPickScalarFieldEnum = (typeof DraftPickScalarFieldEnum)[keyof typeof DraftPickScalarFieldEnum]
 
 
+export const LeagueSessionScalarFieldEnum = {
+  id: 'id',
+  leagueId: 'leagueId',
+  session: 'session',
+  status: 'status',
+  startTime: 'startTime',
+  endTime: 'endTime'
+} as const
+
+export type LeagueSessionScalarFieldEnum = (typeof LeagueSessionScalarFieldEnum)[keyof typeof LeagueSessionScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: 'DbNull',
+  JsonNull: 'JsonNull'
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -168,4 +190,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: 'DbNull',
+  JsonNull: 'JsonNull',
+  AnyNull: 'AnyNull'
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
