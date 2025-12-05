@@ -9,11 +9,11 @@ export interface GammaMarket {
   endDate: string; // ISO string
   active: boolean;
   closed: boolean;
-  liquidity: number;
-  volume: number;
-  outcomes: string[]; // ["Yes", "No"]
-  outcomePrices: string[]; // ["0.65", "0.35"]
-  clobTokenIds: string[]; // ["token_yes", "token_no"]
+  liquidity: number | string;
+  volume: number | string;
+  outcomes: string[] | string; // May come as JSON string from API
+  outcomePrices: string[] | string; // May come as JSON string "[\"0.65\", \"0.35\"]"
+  clobTokenIds: string[] | string; // May come as JSON string
   tokens?: {
     tokenId: string;
     outcome: string;

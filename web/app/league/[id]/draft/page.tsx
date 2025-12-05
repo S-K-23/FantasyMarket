@@ -118,6 +118,10 @@ export default function DraftPage() {
 
     useEffect(() => {
         fetchDraftData();
+
+        // Poll for updates every 5 seconds (for when other players pick)
+        const interval = setInterval(fetchDraftData, 5000);
+        return () => clearInterval(interval);
     }, [fetchDraftData]);
 
     // Get current drafter based on snake draft logic
@@ -144,10 +148,21 @@ export default function DraftPage() {
     // Handle draft pick
     const handleDraftPick = async (market: Market, prediction: 'YES' | 'NO') => {
         if (drafting) return;
+        if (!publicKey) {
+            alert('Please connect your wallet');
+            return;
+        }
 
         const currentDrafter = getCurrentDrafter();
         if (!currentDrafter) {
             alert('No players in draft order');
+            return;
+        }
+
+        // Check if it's your turn
+        const myAddress = publicKey.toBase58();
+        if (currentDrafter !== myAddress) {
+            alert(`It's not your turn! Waiting for ${currentDrafter.slice(0, 6)}...`);
             return;
         }
 
@@ -172,7 +187,7 @@ export default function DraftPage() {
                     marketTitle: market.title,
                     marketCategory: market.category,
                     marketEndDate: market.end_date,
-                    player: currentDrafter,
+                    player: publicKey.toBase58(), // Send the CURRENT USER's address, not whoever's turn it is
                     prediction,
                     session: league?.currentSession || 1,
                     pickIndex: currentPickIndex,
@@ -256,6 +271,10 @@ export default function DraftPage() {
         ? draftPicks.filter(p => p.player === publicKey.toBase58())
         : [];
 
+    // Check if it's my turn
+    const currentDrafter = getCurrentDrafter();
+    const isMyTurn = publicKey && currentDrafter === publicKey.toBase58();
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800">
@@ -302,7 +321,7 @@ export default function DraftPage() {
 
             <div className="container mx-auto px-4 py-8">
                 {/* Draft Status Banner */}
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 mb-8">
+                <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 mb-4">
                     <div className="flex justify-between items-center">
                         <div>
                             <h1 className="text-3xl font-bold">{league.name}</h1>
@@ -318,6 +337,25 @@ export default function DraftPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* Turn Indicator */}
+                {!isDraftComplete && (
+                    <div className={`rounded-xl p-4 mb-8 text-center ${isMyTurn
+                        ? 'bg-green-600/80 border-2 border-green-400'
+                        : 'bg-amber-600/60 border-2 border-amber-400'}`}>
+                        {isMyTurn ? (
+                            <div>
+                                <span className="text-2xl font-bold">🎯 YOUR TURN!</span>
+                                <p className="text-green-100 text-sm">Select a market and prediction below</p>
+                            </div>
+                        ) : (
+                            <div>
+                                <span className="text-xl font-bold">⏳ Waiting for {currentDrafter?.slice(0, 6)}...{currentDrafter?.slice(-4)}</span>
+                                <p className="text-amber-100 text-sm">The draft will update automatically when they pick</p>
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {isDraftComplete && (
                     <div className="bg-green-600 rounded-xl p-6 mb-8">
@@ -448,30 +486,30 @@ export default function DraftPage() {
                                                 {/* Action Buttons */}
                                                 <div className="flex gap-2">
                                                     <button
-                                                        disabled={yesDisabled || isDraftComplete || drafting || draftOrder.length === 0}
+                                                        disabled={!isMyTurn || yesDisabled || isDraftComplete || drafting || draftOrder.length === 0}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             handleDraftPick(market, 'YES');
                                                         }}
-                                                        className={`flex-1 px-3 py-2 rounded text-sm font-bold transition ${yesDisabled || isDraftComplete || draftOrder.length === 0
+                                                        className={`flex-1 px-3 py-2 rounded text-sm font-bold transition ${!isMyTurn || yesDisabled || isDraftComplete || draftOrder.length === 0
                                                             ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                                                             : 'bg-green-600 hover:bg-green-500'
                                                             }`}
                                                     >
-                                                        {yesDisabled ? '✓ YES Drafted' : `Draft YES @ ${formatCents(market.current_price_yes)}`}
+                                                        {yesDisabled ? '✓ YES Drafted' : !isMyTurn ? 'Wait...' : `Draft YES @ ${formatCents(market.current_price_yes)}`}
                                                     </button>
                                                     <button
-                                                        disabled={noDisabled || isDraftComplete || drafting || draftOrder.length === 0}
+                                                        disabled={!isMyTurn || noDisabled || isDraftComplete || drafting || draftOrder.length === 0}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             handleDraftPick(market, 'NO');
                                                         }}
-                                                        className={`flex-1 px-3 py-2 rounded text-sm font-bold transition ${noDisabled || isDraftComplete || draftOrder.length === 0
+                                                        className={`flex-1 px-3 py-2 rounded text-sm font-bold transition ${!isMyTurn || noDisabled || isDraftComplete || draftOrder.length === 0
                                                             ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                                                             : 'bg-red-600 hover:bg-red-500'
                                                             }`}
                                                     >
-                                                        {noDisabled ? '✓ NO Drafted' : `Draft NO @ ${formatCents(market.current_price_no)}`}
+                                                        {noDisabled ? '✓ NO Drafted' : !isMyTurn ? 'Wait...' : `Draft NO @ ${formatCents(market.current_price_no)}`}
                                                     </button>
                                                 </div>
 
