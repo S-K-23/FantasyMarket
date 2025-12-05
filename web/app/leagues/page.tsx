@@ -21,10 +21,10 @@ export default function Leagues() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-background to-muted">
-            <nav className="border-b">
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+            <nav className="border-b border-gray-700 bg-gray-900/50 backdrop-blur">
                 <div className="container mx-auto px-4 py-4">
-                    <Link href="/" className="text-xl font-bold">← Back to Home</Link>
+                    <Link href="/" className="text-xl font-bold hover:text-blue-400">← Back to Home</Link>
                 </div>
             </nav>
 
@@ -32,13 +32,13 @@ export default function Leagues() {
                 <h1 className="text-4xl font-bold mb-8">Browse Leagues</h1>
 
                 {loading ? (
-                    <p>Loading leagues...</p>
+                    <p className="text-gray-400">Loading leagues...</p>
                 ) : leagues.length === 0 ? (
                     <div className="text-center py-12">
-                        <p className="text-muted-foreground mb-4">No leagues yet.</p>
+                        <p className="text-gray-400 mb-4">No leagues yet.</p>
                         <Link
                             href="/league/create"
-                            className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
+                            className="inline-flex h-11 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-purple-600 px-8 text-sm font-medium text-white shadow-lg hover:from-blue-500 hover:to-purple-500 transition-all"
                         >
                             Create the First League
                         </Link>
@@ -49,10 +49,10 @@ export default function Leagues() {
                             <Link
                                 key={league.id}
                                 href={`/league/${league.id}/lobby`}
-                                className="bg-card p-6 rounded-lg border hover:border-primary transition-colors"
+                                className="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-gray-500 transition-all group"
                             >
-                                <h3 className="text-xl font-semibold mb-2">{league.name}</h3>
-                                <div className="space-y-1 text-sm text-muted-foreground">
+                                <h3 className="text-xl font-semibold mb-2 group-hover:text-blue-400 transition">{league.name}</h3>
+                                <div className="space-y-1 text-sm text-gray-400">
                                     <p>Buy-in: {league.buyIn} {league.currency}</p>
                                     <p>Players: {league.currentPlayers}/{league.maxPlayers}</p>
                                     <p>Sessions: {league.totalSessions}</p>

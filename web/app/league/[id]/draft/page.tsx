@@ -58,6 +58,7 @@ interface League {
 export default function DraftPage() {
     const params = useParams();
     const router = useRouter();
+    const { publicKey, connected } = useWallet();
     const [league, setLeague] = useState<League | null>(null);
     const [markets, setMarkets] = useState<Market[]>([]);
     const [players, setPlayers] = useState<Player[]>([]);
@@ -69,9 +70,8 @@ export default function DraftPage() {
     const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [categoryFilter, setCategoryFilter] = useState<string>('All');
-    const { publicKey } = useWallet();
     const [tradeConfig, setTradeConfig] = useState<{ pick: DraftPick | null, isOpen: boolean }>({ pick: null, isOpen: false });
-    const [tradeRecipient, setTradeRecipient] = useState('');
+    const [tradeRecipient, setTradeRecipient] = useState<string>('');
 
     const fetchDraftData = useCallback(async () => {
         if (!params.id) return;
@@ -116,12 +116,9 @@ export default function DraftPage() {
         }
     }, [params.id]);
 
-    // Fetch league data
     useEffect(() => {
         fetchDraftData();
     }, [fetchDraftData]);
-
-    const myPicks = draftPicks.filter(p => p.player === publicKey?.toBase58());
 
     // Get current drafter based on snake draft logic
     const getCurrentDrafter = useCallback(() => {
@@ -253,6 +250,11 @@ export default function DraftPage() {
     const totalPicksNeeded = (league?.marketsPerSession || 5) * draftOrder.length;
     const isDraftComplete = currentPickIndex >= totalPicksNeeded;
     const currentRound = Math.floor(currentPickIndex / Math.max(draftOrder.length, 1)) + 1;
+
+    // Get my picks
+    const myPicks = publicKey
+        ? draftPicks.filter(p => p.player === publicKey.toBase58())
+        : [];
 
     if (loading) {
         return (
@@ -501,33 +503,44 @@ export default function DraftPage() {
                                     myPicks.map((pick) => (
                                         <div key={pick.id} className="p-2 bg-gray-700/50 rounded text-sm">
                                             <div className="flex justify-between items-center">
-                                                <span className="text-gray-300 truncate flex-1 mr-2">
-                                                    {pick.marketId.slice(0, 20)}...
+                                                <span className="text-gray-300 truncate flex-1 mr-2" title={pick.marketTitle || pick.marketId}>
+                                                    {pick.marketTitle || pick.marketId.slice(0, 20) + '...'}
                                                 </span>
                                                 <span className={`px-2 py-0.5 rounded font-bold text-xs ${pick.prediction === 'YES' ? 'bg-green-600' : 'bg-red-600'
                                                     }`}>
                                                     {pick.prediction}
                                                 </span>
                                             </div>
-                                            {pick.snapshotOdds && (
-                                                <div className="text-xs text-gray-400 mt-1">
-                                                    Drafted at {(pick.snapshotOdds / 100).toFixed(0)}%
-                                                </div>
-                                            )}
+                                            <div className="flex justify-between items-center mt-2">
+                                                {pick.snapshotOdds && (
+                                                    <div className="text-xs text-gray-400">
+                                                        Drafted at {(pick.snapshotOdds / 100).toFixed(0)}%
+                                                    </div>
+                                                )}
+                                                <button
+                                                    onClick={() => setTradeConfig({ pick, isOpen: true })}
+                                                    className="text-xs bg-blue-600 hover:bg-blue-500 px-2 py-1 rounded transition"
+                                                >
+                                                    Trade
+                                                </button>
+                                            </div>
+                                        </div >
+                                    ))
+                                )
+                                }
+                                {/* Placeholder slots */}
+                                {
+                                    Array.from({ length: Math.max(0, (league.marketsPerSession || 5) - myPicks.length) }).map((_, i) => (
+                                        <div key={`placeholder-${i}`} className="p-3 border-2 border-dashed border-gray-600 rounded text-center text-gray-500 text-sm">
+                                            Pick {myPicks.length + i + 1}
                                         </div>
                                     ))
-                                )}
-                                {/* Placeholder slots */}
-                                {Array.from({ length: Math.max(0, (league.marketsPerSession || 5) - myPicks.length) }).map((_, i) => (
-                                    <div key={`placeholder-${i}`} className="p-3 border-2 border-dashed border-gray-600 rounded text-center text-gray-500 text-sm">
-                                        Pick {myPicks.length + i + 1}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                                }
+                            </div >
+                        </div >
 
                         {/* Recent Activity */}
-                        <div className="bg-gray-800 rounded-xl p-4">
+                        < div className="bg-gray-800 rounded-xl p-4" >
                             <h2 className="font-bold text-lg mb-3 border-b border-gray-700 pb-2">
                                 Recent Picks
                             </h2>
@@ -546,57 +559,59 @@ export default function DraftPage() {
                                     ))
                                 )}
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        </div >
+                    </div >
+                </div >
+            </div >
 
             {/* Trade Dialog */}
-            {tradeConfig.isOpen && (
-                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-                    <div className="bg-gray-800 p-6 rounded-xl w-full max-w-md border border-gray-700">
-                        <h3 className="text-xl font-bold mb-4">Trade Pick</h3>
-                        <p className="text-gray-300 mb-4 text-sm">
-                            Transferring pick: <span className="font-bold text-white">{tradeConfig.pick?.marketId.slice(0, 10)}... ({tradeConfig.pick?.prediction})</span>
-                        </p>
+            {
+                tradeConfig.isOpen && (
+                    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                        <div className="bg-gray-800 p-6 rounded-xl w-full max-w-md border border-gray-700">
+                            <h3 className="text-xl font-bold mb-4">Trade Pick</h3>
+                            <p className="text-gray-300 mb-4 text-sm">
+                                Transferring pick: <span className="font-bold text-white">{tradeConfig.pick?.marketId.slice(0, 10)}... ({tradeConfig.pick?.prediction})</span>
+                            </p>
 
-                        <div className="mb-4">
-                            <label className="block text-sm text-gray-400 mb-2">Select Recipient</label>
-                            <select
-                                className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white"
-                                value={tradeRecipient}
-                                onChange={(e) => setTradeRecipient(e.target.value)}
-                            >
-                                <option value="">-- Select Player --</option>
-                                {players
-                                    .filter(p => p.address !== publicKey?.toBase58())
-                                    .map(p => (
-                                        <option key={p.id} value={p.address}>
-                                            {p.address.slice(0, 6)}...{p.address.slice(-4)}
-                                        </option>
-                                    ))
-                                }
-                            </select>
-                        </div>
+                            <div className="mb-4">
+                                <label className="block text-sm text-gray-400 mb-2">Select Recipient</label>
+                                <select
+                                    className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white"
+                                    value={tradeRecipient}
+                                    onChange={(e) => setTradeRecipient(e.target.value)}
+                                >
+                                    <option value="">-- Select Player --</option>
+                                    {players
+                                        .filter(p => p.address !== publicKey?.toBase58())
+                                        .map(p => (
+                                            <option key={p.id} value={p.address}>
+                                                {p.address.slice(0, 6)}...{p.address.slice(-4)}
+                                            </option>
+                                        ))
+                                    }
+                                </select>
+                            </div>
 
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setTradeConfig({ pick: null, isOpen: false })}
-                                className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleTrade}
-                                disabled={!tradeRecipient}
-                                className="flex-1 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold"
-                            >
-                                Confirm Trade
-                            </button>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setTradeConfig({ pick: null, isOpen: false })}
+                                    className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleTrade}
+                                    disabled={!tradeRecipient}
+                                    className="flex-1 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold"
+                                >
+                                    Confirm Trade
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 }

@@ -71,17 +71,17 @@ export default function CreateLeague() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-background to-muted">
-            <nav className="border-b">
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+            <nav className="border-b border-gray-700 bg-gray-900/50 backdrop-blur">
                 <div className="container mx-auto px-4 py-4">
-                    <Link href="/" className="text-xl font-bold">← Back to Home</Link>
+                    <Link href="/" className="text-xl font-bold hover:text-blue-400">← Back to Home</Link>
                 </div>
             </nav>
 
             <div className="container mx-auto px-4 py-12 max-w-2xl">
                 <h1 className="text-4xl font-bold mb-8">Create a League</h1>
 
-                <form onSubmit={handleSubmit} className="space-y-6 bg-card p-8 rounded-lg border">
+                <form onSubmit={handleSubmit} className="space-y-6 bg-gray-800 p-8 rounded-xl border border-gray-700">
                     <div>
                         <label className="block text-sm font-medium mb-2">League Name</label>
                         <input
@@ -89,7 +89,7 @@ export default function CreateLeague() {
                             required
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full px-4 py-2 border rounded-md bg-background"
+                            className="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
                             placeholder="My Fantasy League"
                         />
                     </div>
@@ -99,13 +99,13 @@ export default function CreateLeague() {
                         <select
                             value={formData.category}
                             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                            className="w-full px-4 py-2 border rounded-md bg-background"
+                            className="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
                         >
                             {CATEGORIES.map(cat => (
                                 <option key={cat} value={cat}>{cat}</option>
                             ))}
                         </select>
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-gray-400 mt-1">
                             Restrict draft markets to a specific category (or allow all categories)
                         </p>
                     </div>
@@ -119,7 +119,7 @@ export default function CreateLeague() {
                                 required
                                 value={formData.buyIn}
                                 onChange={(e) => setFormData({ ...formData, buyIn: e.target.value })}
-                                className="w-full px-4 py-2 border rounded-md bg-background"
+                                className="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
                             />
                         </div>
                         <div>
@@ -127,7 +127,7 @@ export default function CreateLeague() {
                             <select
                                 value={formData.currency}
                                 onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                                className="w-full px-4 py-2 border rounded-md bg-background"
+                                className="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
                             >
                                 <option value="SOL">SOL</option>
                                 <option value="USDC">USDC</option>
@@ -144,7 +144,7 @@ export default function CreateLeague() {
                             required
                             value={formData.maxPlayers}
                             onChange={(e) => setFormData({ ...formData, maxPlayers: e.target.value })}
-                            className="w-full px-4 py-2 border rounded-md bg-background"
+                            className="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
                         />
                     </div>
 
@@ -157,7 +157,7 @@ export default function CreateLeague() {
                             required
                             value={formData.totalSessions}
                             onChange={(e) => setFormData({ ...formData, totalSessions: e.target.value })}
-                            className="w-full px-4 py-2 border rounded-md bg-background"
+                            className="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
                         />
                     </div>
 
@@ -170,12 +170,12 @@ export default function CreateLeague() {
                             required
                             value={formData.marketsPerSession}
                             onChange={(e) => setFormData({ ...formData, marketsPerSession: e.target.value })}
-                            className="w-full px-4 py-2 border rounded-md bg-background"
+                            className="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
                         />
                     </div>
 
-                    <div className="bg-muted p-4 rounded-md">
-                        <p className="text-sm text-muted-foreground">
+                    <div className="bg-gray-700/50 p-4 rounded-md">
+                        <p className="text-sm text-gray-300">
                             <strong>Estimated Prize Pool:</strong> {parseFloat(formData.buyIn) * parseInt(formData.maxPlayers)} {formData.currency}
                         </p>
                     </div>
@@ -183,7 +183,7 @@ export default function CreateLeague() {
                     <button
                         type="submit"
                         disabled={loading || !connected}
-                        className="w-full h-11 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 disabled:opacity-50"
+                        className="w-full h-11 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-purple-600 px-8 text-sm font-medium text-white shadow-lg hover:from-blue-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
                         {loading ? 'Creating...' : connected ? 'Create League' : 'Connect Wallet First'}
                     </button>

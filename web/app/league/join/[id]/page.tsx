@@ -151,26 +151,26 @@ export default function JoinLeaguePage() {
         }
     };
 
-    if (loading) return <div className="p-8 text-center">Loading league details...</div>;
-    if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
-    if (!league) return <div className="p-8 text-center">League not found</div>;
+    if (loading) return <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 p-8 text-center text-white">Loading league details...</div>;
+    if (error) return <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 p-8 text-center text-red-400">{error}</div>;
+    if (!league) return <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 p-8 text-center text-white">League not found</div>;
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-background to-muted p-8">
-            <div className="max-w-md mx-auto bg-card border rounded-lg p-6 shadow-lg">
-                <h1 className="text-3xl font-bold mb-2">{league.name}</h1>
-                <p className="text-muted-foreground mb-6">Hosted by {league.creator.slice(0, 6)}...{league.creator.slice(-4)}</p>
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 p-8">
+            <div className="max-w-md mx-auto bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-lg">
+                <h1 className="text-3xl font-bold mb-2 text-white">{league.name}</h1>
+                <p className="text-gray-400 mb-6">Hosted by {league.creator.slice(0, 6)}...{league.creator.slice(-4)}</p>
 
                 <div className="space-y-4 mb-8">
-                    <div className="flex justify-between border-b pb-2">
+                    <div className="flex justify-between border-b border-gray-700 pb-2 text-white">
                         <span>Buy-in</span>
                         <span className="font-bold">{league.buyIn} {league.currency}</span>
                     </div>
-                    <div className="flex justify-between border-b pb-2">
+                    <div className="flex justify-between border-b border-gray-700 pb-2 text-white">
                         <span>Players</span>
                         <span>{league.currentPlayers} / {league.maxPlayers}</span>
                     </div>
-                    <div className="flex justify-between border-b pb-2">
+                    <div className="flex justify-between border-b border-gray-700 pb-2 text-white">
                         <span>Sessions</span>
                         <span>{league.totalSessions}</span>
                     </div>
@@ -180,13 +180,13 @@ export default function JoinLeaguePage() {
                     <button
                         onClick={handleJoin}
                         disabled={joining}
-                        className="w-full py-3 rounded-md bg-primary text-primary-foreground font-bold hover:bg-primary/90 disabled:opacity-50"
+                        className="w-full py-3 rounded-md bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold hover:from-blue-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
                         {joining ? 'Processing...' : `Pay ${league.buyIn} ${league.currency} to Join`}
                     </button>
                 ) : (
-                    <div className="flex flex-col items-center gap-4 p-4 bg-muted rounded-md">
-                        <p className="text-sm text-muted-foreground">Please connect your wallet to join.</p>
+                    <div className="flex flex-col items-center gap-4 p-4 bg-gray-700/50 rounded-md">
+                        <p className="text-sm text-gray-400">Please connect your wallet to join.</p>
                         <div className="wallet-adapter-button-trigger">
                             <WalletMultiButton />
                         </div>
@@ -194,11 +194,11 @@ export default function JoinLeaguePage() {
                 )}
 
                 <div className="mt-4 text-center">
-                    <Link href="/" className="text-sm text-muted-foreground hover:underline flex items-center justify-center gap-2">
+                    <Link href="/" className="text-sm text-gray-400 hover:text-blue-400 hover:underline transition flex items-center justify-center gap-2">
                         🏠 Back to Home
                     </Link>
-                </div>
-            </div>
-        </div>
+                </div >
+            </div >
+        </div >
     );
 }
