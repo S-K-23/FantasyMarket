@@ -19,6 +19,8 @@ interface Player {
     id: number;
     address: string;
     points: number;
+    streak?: number;
+    rank?: number;
 }
 
 interface DraftPick {
@@ -57,12 +59,15 @@ export default function DraftRoomPage() {
 
     const [league, setLeague] = useState<League | null>(null);
     const [markets, setMarkets] = useState<Market[]>([]);
+    const [players, setPlayers] = useState<Player[]>([]);
     const [draftPicks, setDraftPicks] = useState<DraftPick[]>([]);
     const [loading, setLoading] = useState(true);
     const [drafting, setDrafting] = useState(false);
     const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [categoryFilter, setCategoryFilter] = useState<string>('All');
+    const [tradeConfig, setTradeConfig] = useState<{ pick: DraftPick | null, isOpen: boolean }>({ pick: null, isOpen: false });
+    const [tradeRecipient, setTradeRecipient] = useState<string>('');
 
     // Fetch all draft data
     const fetchDraftData = useCallback(async () => {
@@ -101,6 +106,13 @@ export default function DraftRoomPage() {
             if (marketsRes.ok) {
                 const marketsData = await marketsRes.json();
                 setMarkets(marketsData);
+            }
+
+            // Fetch players for leaderboard
+            const playersRes = await fetch(`/api/leagues/${leagueInfo.id}/players`);
+            if (playersRes.ok) {
+                const playersData = await playersRes.json();
+                setPlayers(playersData.players || []);
             }
 
             setLoading(false);
@@ -205,6 +217,37 @@ export default function DraftRoomPage() {
         }
 
         setDrafting(false);
+    };
+
+    const handleTrade = async () => {
+        if (!tradeConfig.pick || !tradeRecipient || !publicKey) return;
+
+        try {
+            const res = await fetch('/api/draft/trade', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    pickId: tradeConfig.pick.id,
+                    fromPlayer: publicKey.toBase58(),
+                    toPlayer: tradeRecipient
+                })
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || 'Failed to trade pick');
+            }
+
+            // Refresh data
+            fetchDraftData();
+            setTradeConfig({ pick: null, isOpen: false });
+            setTradeRecipient('');
+            alert('Trade successful!');
+
+        } catch (err) {
+            console.error('Trade error:', err);
+            alert(`Trade failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        }
     };
 
     // Calculate progress
@@ -514,24 +557,35 @@ export default function DraftRoomPage() {
                                         No picks yet
                                     </p>
                                 ) : (
-                                    myPicks.map((pick) => (
-                                        <div key={pick.id} className="p-2 bg-gray-700/50 rounded text-sm">
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-gray-300 truncate flex-1 mr-2">
-                                                    {pick.marketId.slice(0, 20)}...
-                                                </span>
-                                                <span className={`px-2 py-0.5 rounded font-bold text-xs ${pick.prediction === 'YES' ? 'bg-green-600' : 'bg-red-600'
-                                                    }`}>
-                                                    {pick.prediction}
-                                                </span>
-                                            </div>
-                                            {pick.snapshotOdds && (
-                                                <div className="text-xs text-gray-400 mt-1">
-                                                    Drafted at {(pick.snapshotOdds / 100).toFixed(0)}%
+                                    myPicks.map((pick) => {
+                                        const market = markets.find(m => m.id === pick.marketId);
+                                        return (
+                                            <div key={pick.id} className="p-2 bg-gray-700/50 rounded text-sm">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-gray-300 truncate flex-1 mr-2" title={market?.question || pick.marketId}>
+                                                        {market ? market.question : pick.marketId.slice(0, 20) + '...'}
+                                                    </span>
+                                                    <span className={`px-2 py-0.5 rounded font-bold text-xs ${pick.prediction === 'YES' ? 'bg-green-600' : 'bg-red-600'
+                                                        }`}>
+                                                        {pick.prediction}
+                                                    </span>
                                                 </div>
-                                            )}
-                                        </div>
-                                    ))
+                                                <div className="flex justify-between items-center mt-2">
+                                                    {pick.snapshotOdds && (
+                                                        <div className="text-xs text-gray-400">
+                                                            Drafted at {(pick.snapshotOdds / 100).toFixed(0)}%
+                                                        </div>
+                                                    )}
+                                                    <button
+                                                        onClick={() => setTradeConfig({ pick, isOpen: true })}
+                                                        className="text-xs bg-blue-600 hover:bg-blue-500 px-2 py-1 rounded transition"
+                                                    >
+                                                        Trade
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })
                                 )}
                                 {/* Placeholder slots */}
                                 {Array.from({ length: Math.max(0, (league.marketsPerSession || 5) - myPicks.length) }).map((_, i) => (
@@ -539,6 +593,47 @@ export default function DraftRoomPage() {
                                         Pick {myPicks.length + i + 1}
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+
+                        {/* Leaderboard */}
+                        <div className="bg-gray-800 rounded-xl p-4">
+                            <h2 className="font-bold text-lg mb-3 border-b border-gray-700 pb-2">
+                                Leaderboard
+                            </h2>
+                            <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                                {players.length === 0 ? (
+                                    <p className="text-gray-400 text-sm text-center py-4">No players yet</p>
+                                ) : (
+                                    players
+                                        .sort((a, b) => b.points - a.points)
+                                        .map((player, index) => {
+                                            const isMe = publicKey && player.address === publicKey.toBase58();
+                                            return (
+                                                <div
+                                                    key={player.id}
+                                                    className={`p-2 rounded flex justify-between items-center ${isMe ? 'bg-purple-900/30 border border-purple-600' : 'bg-gray-700/30'
+                                                        }`}
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        <span className={`text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full ${index === 0 ? 'bg-yellow-500 text-black' :
+                                                            index === 1 ? 'bg-gray-400 text-black' :
+                                                                index === 2 ? 'bg-orange-700 text-white' :
+                                                                    'bg-gray-600 text-gray-300'
+                                                            }`}>
+                                                            {index + 1}
+                                                        </span>
+                                                        <span className="font-mono text-xs">
+                                                            {player.address.slice(0, 6)}...
+                                                        </span>
+                                                    </div>
+                                                    <span className="font-bold text-sm text-green-400">
+                                                        {player.points} pts
+                                                    </span>
+                                                </div>
+                                            );
+                                        })
+                                )}
                             </div>
                         </div>
 
@@ -566,6 +661,53 @@ export default function DraftRoomPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Trade Dialog */}
+            {tradeConfig.isOpen && (
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                    <div className="bg-gray-800 p-6 rounded-xl w-full max-w-md border border-gray-700">
+                        <h3 className="text-xl font-bold mb-4">Trade Pick</h3>
+                        <p className="text-gray-300 mb-4 text-sm">
+                            Transferring pick: <span className="font-bold text-white">{tradeConfig.pick?.marketId.slice(0, 10)}... ({tradeConfig.pick?.prediction})</span>
+                        </p>
+
+                        <div className="mb-4">
+                            <label className="block text-sm text-gray-400 mb-2">Select Recipient</label>
+                            <select
+                                className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white"
+                                value={tradeRecipient}
+                                onChange={(e) => setTradeRecipient(e.target.value)}
+                            >
+                                <option value="">-- Select Player --</option>
+                                {players
+                                    .filter(p => p.address !== publicKey?.toBase58())
+                                    .map(p => (
+                                        <option key={p.id} value={p.address}>
+                                            {p.address.slice(0, 6)}...{p.address.slice(-4)}
+                                        </option>
+                                    ))
+                                }
+                            </select>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setTradeConfig({ pick: null, isOpen: false })}
+                                className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleTrade}
+                                disabled={!tradeRecipient}
+                                className="flex-1 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold"
+                            >
+                                Confirm Trade
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
