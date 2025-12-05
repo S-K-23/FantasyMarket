@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 interface Market {
     market_id: string;
@@ -24,6 +25,7 @@ interface Market {
 interface Player {
     id: number;
     address: string;
+    points: number;
 }
 
 interface DraftPick {
@@ -65,64 +67,61 @@ export default function DraftPage() {
     const [loading, setLoading] = useState(true);
     const [drafting, setDrafting] = useState(false);
     const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
-    const [marketTitles, setMarketTitles] = useState<Record<string, string>>({});
+    const [error, setError] = useState<string | null>(null);
+    const [categoryFilter, setCategoryFilter] = useState<string>('All');
+    const { publicKey } = useWallet();
+    const [tradeConfig, setTradeConfig] = useState<{ pick: DraftPick | null, isOpen: boolean }>({ pick: null, isOpen: false });
+    const [tradeRecipient, setTradeRecipient] = useState('');
+
+    const fetchDraftData = useCallback(async () => {
+        if (!params.id) return;
+
+        try {
+            // Fetch league
+            const leagueRes = await fetch(`/api/leagues?id=${params.id}`);
+            const leagueData = await leagueRes.json();
+            const leagueInfo = Array.isArray(leagueData) ? leagueData[0] : leagueData;
+            setLeague(leagueInfo);
+
+            // Fetch players for this league
+            const playersRes = await fetch(`/api/leagues/${params.id}/players`);
+            if (playersRes.ok) {
+                const playersData = await playersRes.json();
+                setPlayers(playersData.players || []);
+
+                // Create draft order (snake draft)
+                const order = playersData.players?.map((p: Player) => p.address) || [];
+                setDraftOrder(order);
+            }
+
+            // Fetch existing draft picks
+            const picksRes = await fetch(`/api/draft/picks?leagueId=${params.id}`);
+            if (picksRes.ok) {
+                const picksData = await picksRes.json();
+                setDraftPicks(picksData.picks || []);
+                setCurrentPickIndex(picksData.picks?.length || 0);
+            }
+
+            // Fetch markets
+            const marketsRes = await fetch('/api/markets?limit=30');
+            if (marketsRes.ok) {
+                const marketsData = await marketsRes.json();
+                setMarkets(marketsData);
+            }
+
+            setLoading(false);
+        } catch (error) {
+            console.error('Failed to fetch data:', error);
+            setLoading(false);
+        }
+    }, [params.id]);
 
     // Fetch league data
     useEffect(() => {
-        if (!params.id) return;
+        fetchDraftData();
+    }, [fetchDraftData]);
 
-        const fetchData = async () => {
-            try {
-                // Fetch league
-                const leagueRes = await fetch(`/api/leagues?id=${params.id}`);
-                const leagueData = await leagueRes.json();
-                const leagueInfo = Array.isArray(leagueData) ? leagueData[0] : leagueData;
-                setLeague(leagueInfo);
-
-                // Fetch players for this league
-                const playersRes = await fetch(`/api/leagues/${params.id}/players`);
-                if (playersRes.ok) {
-                    const playersData = await playersRes.json();
-                    setPlayers(playersData.players || []);
-
-                    // Create draft order (snake draft)
-                    const order = playersData.players?.map((p: Player) => p.address) || [];
-                    setDraftOrder(order);
-                }
-
-                // Fetch existing draft picks
-                const picksRes = await fetch(`/api/draft/picks?leagueId=${params.id}`);
-                if (picksRes.ok) {
-                    const picksData = await picksRes.json();
-                    setDraftPicks(picksData.picks || []);
-                    setCurrentPickIndex(picksData.picks?.length || 0);
-                }
-
-                // Fetch real Polymarket markets - filter by league category if specified
-                const categoryParam = leagueInfo.category ? `&category=${encodeURIComponent(leagueInfo.category)}` : '';
-                const marketsRes = await fetch(`/api/polymarket/markets?limit=30&min_liquidity=100${categoryParam}`);
-                if (marketsRes.ok) {
-                    const marketsData = await marketsRes.json();
-                    const marketsList = marketsData.markets || [];
-                    setMarkets(marketsList);
-
-                    // Build title lookup
-                    const titles: Record<string, string> = {};
-                    marketsList.forEach((m: Market) => {
-                        titles[m.market_id] = m.title;
-                    });
-                    setMarketTitles(titles);
-                }
-
-                setLoading(false);
-            } catch (error) {
-                console.error('Failed to fetch data:', error);
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [params.id]);
+    const myPicks = draftPicks.filter(p => p.player === publicKey?.toBase58());
 
     // Get current drafter based on snake draft logic
     const getCurrentDrafter = useCallback(() => {
@@ -198,6 +197,8 @@ export default function DraftPage() {
             } else {
                 const error = await res.json();
                 alert(`Draft failed: ${error.error || 'Unknown error'}`);
+                // Refresh data in case of sync error or out-of-turn
+                fetchDraftData();
             }
         } catch (error) {
             console.error('Draft pick error:', error);
@@ -205,6 +206,37 @@ export default function DraftPage() {
         }
 
         setDrafting(false);
+    };
+
+    const handleTrade = async () => {
+        if (!tradeConfig.pick || !tradeRecipient || !publicKey) return;
+
+        try {
+            const res = await fetch('/api/draft/trade', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    pickId: tradeConfig.pick.id,
+                    fromPlayer: publicKey.toBase58(),
+                    toPlayer: tradeRecipient
+                })
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || 'Failed to trade pick');
+            }
+
+            // Refresh data
+            fetchDraftData();
+            setTradeConfig({ pick: null, isOpen: false });
+            setTradeRecipient('');
+            alert('Trade successful!');
+
+        } catch (err) {
+            console.error('Trade error:', err);
+            alert(`Trade failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        }
     };
 
     // Format odds as percentage
@@ -246,9 +278,15 @@ export default function DraftPage() {
             {/* Header */}
             <nav className="border-b border-gray-700 bg-gray-900/50 backdrop-blur">
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-                    <Link href={`/league/${params.id}/lobby`} className="text-xl font-bold hover:text-blue-400">
-                        ← Back to Lobby
-                    </Link>
+                    <div className="flex items-center gap-4">
+                        <Link href="/" className="text-xl font-bold hover:text-blue-400">
+                            🏠 Home
+                        </Link>
+                        <span className="text-gray-600">|</span>
+                        <Link href={`/league/${params.id}/lobby`} className="text-xl font-bold hover:text-blue-400">
+                            ← Back to Lobby
+                        </Link>
+                    </div>
                     <div className="flex items-center gap-4">
                         <span className="text-xs text-green-400">● Live Polymarket Odds</span>
                         {league.category && (
@@ -358,14 +396,14 @@ export default function DraftPage() {
                                 </p>
                             ) : (
                                 <div className="space-y-3 max-h-[600px] overflow-y-auto">
-                                    {markets.map(market => {
+                                    {markets.map((market, index) => {
                                         const yesDisabled = isMarketDrafted(market.market_id, 'YES');
                                         const noDisabled = isMarketDrafted(market.market_id, 'NO');
                                         const isSelected = selectedMarket?.market_id === market.market_id;
 
                                         return (
                                             <div
-                                                key={market.market_id}
+                                                key={`${market.market_id}-${index}`}
                                                 className={`p-4 rounded-lg border transition cursor-pointer ${isSelected
                                                     ? 'bg-blue-900/50 border-blue-500'
                                                     : 'bg-gray-700/50 border-gray-600 hover:border-gray-500'
@@ -460,30 +498,50 @@ export default function DraftPage() {
                                         No picks yet
                                     </p>
                                 ) : (
-                                    [...draftPicks].reverse().map((pick, index) => (
-                                        <div
-                                            key={pick.id || index}
-                                            className="p-3 bg-gray-700/50 rounded-lg"
-                                        >
-                                            <div className="flex justify-between items-center mb-1">
-                                                <span className="font-mono text-xs text-gray-300">
-                                                    {pick.player.slice(0, 8)}...
+                                    myPicks.map((pick) => (
+                                        <div key={pick.id} className="p-2 bg-gray-700/50 rounded text-sm">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-gray-300 truncate flex-1 mr-2">
+                                                    {pick.marketId.slice(0, 20)}...
                                                 </span>
-                                                <span className={`px-2 py-0.5 rounded font-bold text-xs ${pick.prediction === 'YES'
-                                                    ? 'bg-green-600'
-                                                    : 'bg-red-600'
+                                                <span className={`px-2 py-0.5 rounded font-bold text-xs ${pick.prediction === 'YES' ? 'bg-green-600' : 'bg-red-600'
                                                     }`}>
                                                     {pick.prediction}
                                                 </span>
                                             </div>
-                                            <div className="text-xs text-gray-300 mb-1">
-                                                {pick.marketTitle || marketTitles[pick.marketId] || pick.marketId.slice(0, 20) + '...'}
-                                            </div>
                                             {pick.snapshotOdds && (
-                                                <div className="text-xs text-gray-500">
-                                                    Drafted @ {(pick.snapshotOdds / 100).toFixed(1)}%
+                                                <div className="text-xs text-gray-400 mt-1">
+                                                    Drafted at {(pick.snapshotOdds / 100).toFixed(0)}%
                                                 </div>
                                             )}
+                                        </div>
+                                    ))
+                                )}
+                                {/* Placeholder slots */}
+                                {Array.from({ length: Math.max(0, (league.marketsPerSession || 5) - myPicks.length) }).map((_, i) => (
+                                    <div key={`placeholder-${i}`} className="p-3 border-2 border-dashed border-gray-600 rounded text-center text-gray-500 text-sm">
+                                        Pick {myPicks.length + i + 1}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Recent Activity */}
+                        <div className="bg-gray-800 rounded-xl p-4">
+                            <h2 className="font-bold text-lg mb-3 border-b border-gray-700 pb-2">
+                                Recent Picks
+                            </h2>
+                            <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                                {draftPicks.length === 0 ? (
+                                    <p className="text-gray-400 text-sm text-center py-4">No picks yet</p>
+                                ) : (
+                                    [...draftPicks].reverse().slice(0, 10).map((pick) => (
+                                        <div key={pick.id} className="p-2 bg-gray-700/30 rounded text-xs">
+                                            <span className="font-mono">{pick.player.slice(0, 6)}...</span>
+                                            <span className="mx-1">drafted</span>
+                                            <span className={pick.prediction === 'YES' ? 'text-green-400' : 'text-red-400'}>
+                                                {pick.prediction}
+                                            </span>
                                         </div>
                                     ))
                                 )}
@@ -492,6 +550,53 @@ export default function DraftPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Trade Dialog */}
+            {tradeConfig.isOpen && (
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                    <div className="bg-gray-800 p-6 rounded-xl w-full max-w-md border border-gray-700">
+                        <h3 className="text-xl font-bold mb-4">Trade Pick</h3>
+                        <p className="text-gray-300 mb-4 text-sm">
+                            Transferring pick: <span className="font-bold text-white">{tradeConfig.pick?.marketId.slice(0, 10)}... ({tradeConfig.pick?.prediction})</span>
+                        </p>
+
+                        <div className="mb-4">
+                            <label className="block text-sm text-gray-400 mb-2">Select Recipient</label>
+                            <select
+                                className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white"
+                                value={tradeRecipient}
+                                onChange={(e) => setTradeRecipient(e.target.value)}
+                            >
+                                <option value="">-- Select Player --</option>
+                                {players
+                                    .filter(p => p.address !== publicKey?.toBase58())
+                                    .map(p => (
+                                        <option key={p.id} value={p.address}>
+                                            {p.address.slice(0, 6)}...{p.address.slice(-4)}
+                                        </option>
+                                    ))
+                                }
+                            </select>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setTradeConfig({ pick: null, isOpen: false })}
+                                className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleTrade}
+                                disabled={!tradeRecipient}
+                                className="flex-1 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold"
+                            >
+                                Confirm Trade
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
