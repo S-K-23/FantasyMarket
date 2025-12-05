@@ -258,11 +258,14 @@ export default function LeagueLobby() {
                         <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
                             <h3 className="font-semibold mb-4">Invite Friends</h3>
                             <div className="bg-gray-900 p-3 rounded-lg font-mono text-xs break-all text-gray-400 mb-3">
-                                {typeof window !== 'undefined' ? `${window.location.origin}/league/join/${league.leagueId}` : '...'}
+                                {typeof window !== 'undefined'
+                                    ? `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/league/join/${league.leagueId}`
+                                    : '...'}
                             </div>
                             <button
                                 onClick={() => {
-                                    navigator.clipboard.writeText(`${window.location.origin}/league/join/${league.leagueId}`);
+                                    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+                                    navigator.clipboard.writeText(`${baseUrl}/league/join/${league.leagueId}`);
                                     alert('Copied!');
                                 }}
                                 className="w-full py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition"
