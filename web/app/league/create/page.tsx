@@ -26,8 +26,20 @@ export default function CreateLeague() {
         maxPlayers: '8',
         totalSessions: '8',
         marketsPerSession: '5',
-        category: 'All Categories'
+        category: 'All Categories',
+        leagueType: 'STANDARD' as 'STANDARD' | 'ONE_ON_ONE'
     });
+
+    // Auto-configure for 1v1 mode
+    useEffect(() => {
+        if (formData.leagueType === 'ONE_ON_ONE') {
+            setFormData(prev => ({
+                ...prev,
+                maxPlayers: '2',
+                totalSessions: '1'
+            }));
+        }
+    }, [formData.leagueType]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -55,20 +67,26 @@ export default function CreateLeague() {
                     totalSessions: formData.totalSessions,
                     marketsPerSession: formData.marketsPerSession,
                     category: formData.category === 'All Categories' ? null : formData.category,
+                    leagueType: formData.leagueType,
                 })
             });
 
-            if (!response.ok) throw new Error('Failed to create league');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.details || errorData.error || 'Failed to create league');
+            }
 
             const league = await response.json();
             router.push(`/league/${league.id}/lobby`);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error creating league:', error);
-            alert('Failed to create league. Please try again.');
+            alert(`Failed to create league: ${error.message}`);
         } finally {
             setLoading(false);
         }
     };
+
+    const is1v1 = formData.leagueType === 'ONE_ON_ONE';
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
@@ -82,6 +100,47 @@ export default function CreateLeague() {
                 <h1 className="text-4xl font-bold mb-8">Create a League</h1>
 
                 <form onSubmit={handleSubmit} className="space-y-6 bg-gray-800 p-8 rounded-xl border border-gray-700">
+                    {/* League Type Selection */}
+                    <div>
+                        <label className="block text-sm font-medium mb-3">League Type</label>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, leagueType: 'STANDARD' })}
+                                className={`p-4 rounded-lg border-2 transition-all ${formData.leagueType === 'STANDARD'
+                                    ? 'border-blue-500 bg-blue-500/20'
+                                    : 'border-gray-600 hover:border-gray-500'
+                                    }`}
+                            >
+                                <div className="text-lg font-bold mb-1">🏆 Standard</div>
+                                <div className="text-xs text-gray-400">2-12 players, multi-session fantasy league</div>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, leagueType: 'ONE_ON_ONE' })}
+                                className={`p-4 rounded-lg border-2 transition-all ${formData.leagueType === 'ONE_ON_ONE'
+                                    ? 'border-purple-500 bg-purple-500/20'
+                                    : 'border-gray-600 hover:border-gray-500'
+                                    }`}
+                            >
+                                <div className="text-lg font-bold mb-1">⚔️ 1v1 Duel</div>
+                                <div className="text-xs text-gray-400">Head-to-head, ELO ranked</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    {is1v1 && (
+                        <div className="bg-purple-900/30 border border-purple-600/50 rounded-lg p-4">
+                            <h4 className="font-semibold text-purple-300 mb-2">⚔️ 1v1 Duel Mode</h4>
+                            <ul className="text-sm text-gray-300 space-y-1">
+                                <li>• 2 players compete head-to-head</li>
+                                <li>• Simulated Polymarket positions</li>
+                                <li>• Winner gains +100 ELO, loser -100 ELO</li>
+                                <li>• Winner takes the prize pool</li>
+                            </ul>
+                        </div>
+                    )}
+
                     <div>
                         <label className="block text-sm font-medium mb-2">League Name</label>
                         <input
@@ -90,7 +149,7 @@ export default function CreateLeague() {
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             className="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
-                            placeholder="My Fantasy League"
+                            placeholder={is1v1 ? "1v1 Challenge" : "My Fantasy League"}
                         />
                     </div>
 
@@ -135,31 +194,35 @@ export default function CreateLeague() {
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium mb-2">Max Players (2-12)</label>
-                        <input
-                            type="number"
-                            min="2"
-                            max="12"
-                            required
-                            value={formData.maxPlayers}
-                            onChange={(e) => setFormData({ ...formData, maxPlayers: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
-                        />
-                    </div>
+                    {!is1v1 && (
+                        <>
+                            <div>
+                                <label className="block text-sm font-medium mb-2">Max Players (2-12)</label>
+                                <input
+                                    type="number"
+                                    min="2"
+                                    max="12"
+                                    required
+                                    value={formData.maxPlayers}
+                                    onChange={(e) => setFormData({ ...formData, maxPlayers: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
+                                />
+                            </div>
 
-                    <div>
-                        <label className="block text-sm font-medium mb-2">Number of Sessions</label>
-                        <input
-                            type="number"
-                            min="1"
-                            max="16"
-                            required
-                            value={formData.totalSessions}
-                            onChange={(e) => setFormData({ ...formData, totalSessions: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
-                        />
-                    </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-2">Number of Sessions</label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="16"
+                                    required
+                                    value={formData.totalSessions}
+                                    onChange={(e) => setFormData({ ...formData, totalSessions: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:border-blue-500 focus:outline-none"
+                                />
+                            </div>
+                        </>
+                    )}
 
                     <div>
                         <label className="block text-sm font-medium mb-2">Markets per Session</label>
@@ -176,16 +239,20 @@ export default function CreateLeague() {
 
                     <div className="bg-gray-700/50 p-4 rounded-md">
                         <p className="text-sm text-gray-300">
-                            <strong>Estimated Prize Pool:</strong> {parseFloat(formData.buyIn) * parseInt(formData.maxPlayers)} {formData.currency}
+                            <strong>Prize Pool:</strong> {parseFloat(formData.buyIn) * parseInt(formData.maxPlayers)} {formData.currency}
+                            {is1v1 && <span className="text-purple-400 ml-2">(Winner takes all)</span>}
                         </p>
                     </div>
 
                     <button
                         type="submit"
                         disabled={loading || !connected}
-                        className="w-full h-11 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-purple-600 px-8 text-sm font-medium text-white shadow-lg hover:from-blue-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        className={`w-full h-11 items-center justify-center rounded-md px-8 text-sm font-medium text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all ${is1v1
+                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500'
+                            : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500'
+                            }`}
                     >
-                        {loading ? 'Creating...' : connected ? 'Create League' : 'Connect Wallet First'}
+                        {loading ? 'Creating...' : connected ? (is1v1 ? 'Create 1v1 Duel' : 'Create League') : 'Connect Wallet First'}
                     </button>
                 </form>
             </div>

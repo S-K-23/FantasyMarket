@@ -86,7 +86,7 @@ export default function Home() {
         <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
           Season-long leagues built on prediction markets. Draft real-world events, earn points based on correctness and difficulty, win proportional payouts.
         </p>
-        <div className="flex gap-4 justify-center">
+        <div className="flex gap-4 justify-center flex-wrap">
           <Link
             href="/league/create"
             className="inline-flex h-12 items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-8 text-sm font-medium shadow-lg hover:from-blue-500 hover:to-purple-500 transition-all"
@@ -98,6 +98,12 @@ export default function Home() {
             className="inline-flex h-12 items-center justify-center rounded-lg border border-gray-600 bg-gray-800/50 px-8 text-sm font-medium hover:bg-gray-700 transition-all"
           >
             Browse Leagues
+          </Link>
+          <Link
+            href="/leaderboard"
+            className="inline-flex h-12 items-center justify-center rounded-lg border border-purple-600 bg-purple-900/30 px-8 text-sm font-medium hover:bg-purple-800/50 transition-all"
+          >
+            🏆 Leaderboard
           </Link>
         </div>
       </section>

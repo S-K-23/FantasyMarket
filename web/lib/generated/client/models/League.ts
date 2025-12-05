@@ -60,6 +60,7 @@ export type LeagueMinAggregateOutputType = {
   totalSessions: number | null
   marketsPerSession: number | null
   category: string | null
+  leagueType: string | null
   createdAt: Date | null
 }
 
@@ -77,6 +78,7 @@ export type LeagueMaxAggregateOutputType = {
   totalSessions: number | null
   marketsPerSession: number | null
   category: string | null
+  leagueType: string | null
   createdAt: Date | null
 }
 
@@ -95,6 +97,7 @@ export type LeagueCountAggregateOutputType = {
   marketsPerSession: number
   category: number
   draftOrder: number
+  leagueType: number
   createdAt: number
   _all: number
 }
@@ -134,6 +137,7 @@ export type LeagueMinAggregateInputType = {
   totalSessions?: true
   marketsPerSession?: true
   category?: true
+  leagueType?: true
   createdAt?: true
 }
 
@@ -151,6 +155,7 @@ export type LeagueMaxAggregateInputType = {
   totalSessions?: true
   marketsPerSession?: true
   category?: true
+  leagueType?: true
   createdAt?: true
 }
 
@@ -169,6 +174,7 @@ export type LeagueCountAggregateInputType = {
   marketsPerSession?: true
   category?: true
   draftOrder?: true
+  leagueType?: true
   createdAt?: true
   _all?: true
 }
@@ -274,6 +280,7 @@ export type LeagueGroupByOutputType = {
   marketsPerSession: number
   category: string | null
   draftOrder: string[]
+  leagueType: string
   createdAt: Date
   _count: LeagueCountAggregateOutputType | null
   _avg: LeagueAvgAggregateOutputType | null
@@ -315,6 +322,7 @@ export type LeagueWhereInput = {
   marketsPerSession?: Prisma.IntFilter<"League"> | number
   category?: Prisma.StringNullableFilter<"League"> | string | null
   draftOrder?: Prisma.StringNullableListFilter<"League">
+  leagueType?: Prisma.StringFilter<"League"> | string
   createdAt?: Prisma.DateTimeFilter<"League"> | Date | string
   players?: Prisma.PlayerStatsListRelationFilter
   draftPicks?: Prisma.DraftPickListRelationFilter
@@ -336,6 +344,7 @@ export type LeagueOrderByWithRelationInput = {
   marketsPerSession?: Prisma.SortOrder
   category?: Prisma.SortOrderInput | Prisma.SortOrder
   draftOrder?: Prisma.SortOrder
+  leagueType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   players?: Prisma.PlayerStatsOrderByRelationAggregateInput
   draftPicks?: Prisma.DraftPickOrderByRelationAggregateInput
@@ -360,6 +369,7 @@ export type LeagueWhereUniqueInput = Prisma.AtLeast<{
   marketsPerSession?: Prisma.IntFilter<"League"> | number
   category?: Prisma.StringNullableFilter<"League"> | string | null
   draftOrder?: Prisma.StringNullableListFilter<"League">
+  leagueType?: Prisma.StringFilter<"League"> | string
   createdAt?: Prisma.DateTimeFilter<"League"> | Date | string
   players?: Prisma.PlayerStatsListRelationFilter
   draftPicks?: Prisma.DraftPickListRelationFilter
@@ -381,6 +391,7 @@ export type LeagueOrderByWithAggregationInput = {
   marketsPerSession?: Prisma.SortOrder
   category?: Prisma.SortOrderInput | Prisma.SortOrder
   draftOrder?: Prisma.SortOrder
+  leagueType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.LeagueCountOrderByAggregateInput
   _avg?: Prisma.LeagueAvgOrderByAggregateInput
@@ -407,6 +418,7 @@ export type LeagueScalarWhereWithAggregatesInput = {
   marketsPerSession?: Prisma.IntWithAggregatesFilter<"League"> | number
   category?: Prisma.StringNullableWithAggregatesFilter<"League"> | string | null
   draftOrder?: Prisma.StringNullableListFilter<"League">
+  leagueType?: Prisma.StringWithAggregatesFilter<"League"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"League"> | Date | string
 }
 
@@ -424,6 +436,7 @@ export type LeagueCreateInput = {
   marketsPerSession?: number
   category?: string | null
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
+  leagueType?: string
   createdAt?: Date | string
   players?: Prisma.PlayerStatsCreateNestedManyWithoutLeagueInput
   draftPicks?: Prisma.DraftPickCreateNestedManyWithoutLeagueInput
@@ -445,6 +458,7 @@ export type LeagueUncheckedCreateInput = {
   marketsPerSession?: number
   category?: string | null
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
+  leagueType?: string
   createdAt?: Date | string
   players?: Prisma.PlayerStatsUncheckedCreateNestedManyWithoutLeagueInput
   draftPicks?: Prisma.DraftPickUncheckedCreateNestedManyWithoutLeagueInput
@@ -465,6 +479,7 @@ export type LeagueUpdateInput = {
   marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
+  leagueType?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerStatsUpdateManyWithoutLeagueNestedInput
   draftPicks?: Prisma.DraftPickUpdateManyWithoutLeagueNestedInput
@@ -486,6 +501,7 @@ export type LeagueUncheckedUpdateInput = {
   marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
+  leagueType?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerStatsUncheckedUpdateManyWithoutLeagueNestedInput
   draftPicks?: Prisma.DraftPickUncheckedUpdateManyWithoutLeagueNestedInput
@@ -507,6 +523,7 @@ export type LeagueCreateManyInput = {
   marketsPerSession?: number
   category?: string | null
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
+  leagueType?: string
   createdAt?: Date | string
 }
 
@@ -524,6 +541,7 @@ export type LeagueUpdateManyMutationInput = {
   marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
+  leagueType?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -542,6 +560,7 @@ export type LeagueUncheckedUpdateManyInput = {
   marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
+  leagueType?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -568,6 +587,7 @@ export type LeagueCountOrderByAggregateInput = {
   marketsPerSession?: Prisma.SortOrder
   category?: Prisma.SortOrder
   draftOrder?: Prisma.SortOrder
+  leagueType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -595,6 +615,7 @@ export type LeagueMaxOrderByAggregateInput = {
   totalSessions?: Prisma.SortOrder
   marketsPerSession?: Prisma.SortOrder
   category?: Prisma.SortOrder
+  leagueType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -612,6 +633,7 @@ export type LeagueMinOrderByAggregateInput = {
   totalSessions?: Prisma.SortOrder
   marketsPerSession?: Prisma.SortOrder
   category?: Prisma.SortOrder
+  leagueType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -723,6 +745,7 @@ export type LeagueCreateWithoutPlayersInput = {
   marketsPerSession?: number
   category?: string | null
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
+  leagueType?: string
   createdAt?: Date | string
   draftPicks?: Prisma.DraftPickCreateNestedManyWithoutLeagueInput
   sessions?: Prisma.LeagueSessionCreateNestedManyWithoutLeagueInput
@@ -743,6 +766,7 @@ export type LeagueUncheckedCreateWithoutPlayersInput = {
   marketsPerSession?: number
   category?: string | null
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
+  leagueType?: string
   createdAt?: Date | string
   draftPicks?: Prisma.DraftPickUncheckedCreateNestedManyWithoutLeagueInput
   sessions?: Prisma.LeagueSessionUncheckedCreateNestedManyWithoutLeagueInput
@@ -778,6 +802,7 @@ export type LeagueUpdateWithoutPlayersInput = {
   marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
+  leagueType?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   draftPicks?: Prisma.DraftPickUpdateManyWithoutLeagueNestedInput
   sessions?: Prisma.LeagueSessionUpdateManyWithoutLeagueNestedInput
@@ -798,6 +823,7 @@ export type LeagueUncheckedUpdateWithoutPlayersInput = {
   marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
+  leagueType?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   draftPicks?: Prisma.DraftPickUncheckedUpdateManyWithoutLeagueNestedInput
   sessions?: Prisma.LeagueSessionUncheckedUpdateManyWithoutLeagueNestedInput
@@ -817,6 +843,7 @@ export type LeagueCreateWithoutDraftPicksInput = {
   marketsPerSession?: number
   category?: string | null
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
+  leagueType?: string
   createdAt?: Date | string
   players?: Prisma.PlayerStatsCreateNestedManyWithoutLeagueInput
   sessions?: Prisma.LeagueSessionCreateNestedManyWithoutLeagueInput
@@ -837,6 +864,7 @@ export type LeagueUncheckedCreateWithoutDraftPicksInput = {
   marketsPerSession?: number
   category?: string | null
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
+  leagueType?: string
   createdAt?: Date | string
   players?: Prisma.PlayerStatsUncheckedCreateNestedManyWithoutLeagueInput
   sessions?: Prisma.LeagueSessionUncheckedCreateNestedManyWithoutLeagueInput
@@ -872,6 +900,7 @@ export type LeagueUpdateWithoutDraftPicksInput = {
   marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
+  leagueType?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerStatsUpdateManyWithoutLeagueNestedInput
   sessions?: Prisma.LeagueSessionUpdateManyWithoutLeagueNestedInput
@@ -892,6 +921,7 @@ export type LeagueUncheckedUpdateWithoutDraftPicksInput = {
   marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
+  leagueType?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerStatsUncheckedUpdateManyWithoutLeagueNestedInput
   sessions?: Prisma.LeagueSessionUncheckedUpdateManyWithoutLeagueNestedInput
@@ -911,6 +941,7 @@ export type LeagueCreateWithoutSessionsInput = {
   marketsPerSession?: number
   category?: string | null
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
+  leagueType?: string
   createdAt?: Date | string
   players?: Prisma.PlayerStatsCreateNestedManyWithoutLeagueInput
   draftPicks?: Prisma.DraftPickCreateNestedManyWithoutLeagueInput
@@ -931,6 +962,7 @@ export type LeagueUncheckedCreateWithoutSessionsInput = {
   marketsPerSession?: number
   category?: string | null
   draftOrder?: Prisma.LeagueCreatedraftOrderInput | string[]
+  leagueType?: string
   createdAt?: Date | string
   players?: Prisma.PlayerStatsUncheckedCreateNestedManyWithoutLeagueInput
   draftPicks?: Prisma.DraftPickUncheckedCreateNestedManyWithoutLeagueInput
@@ -966,6 +998,7 @@ export type LeagueUpdateWithoutSessionsInput = {
   marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
+  leagueType?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerStatsUpdateManyWithoutLeagueNestedInput
   draftPicks?: Prisma.DraftPickUpdateManyWithoutLeagueNestedInput
@@ -986,6 +1019,7 @@ export type LeagueUncheckedUpdateWithoutSessionsInput = {
   marketsPerSession?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOrder?: Prisma.LeagueUpdatedraftOrderInput | string[]
+  leagueType?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerStatsUncheckedUpdateManyWithoutLeagueNestedInput
   draftPicks?: Prisma.DraftPickUncheckedUpdateManyWithoutLeagueNestedInput
@@ -1055,6 +1089,7 @@ export type LeagueSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   marketsPerSession?: boolean
   category?: boolean
   draftOrder?: boolean
+  leagueType?: boolean
   createdAt?: boolean
   players?: boolean | Prisma.League$playersArgs<ExtArgs>
   draftPicks?: boolean | Prisma.League$draftPicksArgs<ExtArgs>
@@ -1077,6 +1112,7 @@ export type LeagueSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   marketsPerSession?: boolean
   category?: boolean
   draftOrder?: boolean
+  leagueType?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["league"]>
 
@@ -1095,6 +1131,7 @@ export type LeagueSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   marketsPerSession?: boolean
   category?: boolean
   draftOrder?: boolean
+  leagueType?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["league"]>
 
@@ -1113,10 +1150,11 @@ export type LeagueSelectScalar = {
   marketsPerSession?: boolean
   category?: boolean
   draftOrder?: boolean
+  leagueType?: boolean
   createdAt?: boolean
 }
 
-export type LeagueOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "leagueId" | "name" | "creator" | "buyIn" | "currency" | "maxPlayers" | "currentPlayers" | "status" | "currentSession" | "totalSessions" | "marketsPerSession" | "category" | "draftOrder" | "createdAt", ExtArgs["result"]["league"]>
+export type LeagueOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "leagueId" | "name" | "creator" | "buyIn" | "currency" | "maxPlayers" | "currentPlayers" | "status" | "currentSession" | "totalSessions" | "marketsPerSession" | "category" | "draftOrder" | "leagueType" | "createdAt", ExtArgs["result"]["league"]>
 export type LeagueInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   players?: boolean | Prisma.League$playersArgs<ExtArgs>
   draftPicks?: boolean | Prisma.League$draftPicksArgs<ExtArgs>
@@ -1148,6 +1186,7 @@ export type $LeaguePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     marketsPerSession: number
     category: string | null
     draftOrder: string[]
+    leagueType: string
     createdAt: Date
   }, ExtArgs["result"]["league"]>
   composites: {}
@@ -1589,6 +1628,7 @@ export interface LeagueFieldRefs {
   readonly marketsPerSession: Prisma.FieldRef<"League", 'Int'>
   readonly category: Prisma.FieldRef<"League", 'String'>
   readonly draftOrder: Prisma.FieldRef<"League", 'String[]'>
+  readonly leagueType: Prisma.FieldRef<"League", 'String'>
   readonly createdAt: Prisma.FieldRef<"League", 'DateTime'>
 }
     

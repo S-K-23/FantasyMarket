@@ -71,12 +71,16 @@ export async function POST(request: Request) {
                 totalSessions: parseInt(body.totalSessions),
                 marketsPerSession: body.marketsPerSession ? parseInt(body.marketsPerSession) : 5,
                 category: body.category || null,
+                leagueType: body.leagueType || 'STANDARD',
                 status: 'SETUP',
             }
         });
         return NextResponse.json(league);
-    } catch (error) {
-        console.error('API Error:', error);
-        return NextResponse.json({ error: 'Failed to create league' }, { status: 500 });
+    } catch (error: any) {
+        console.error('API Error creating league:', error);
+        return NextResponse.json({
+            error: 'Failed to create league',
+            details: error?.message || String(error)
+        }, { status: 500 });
     }
 }

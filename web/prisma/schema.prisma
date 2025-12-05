@@ -22,11 +22,21 @@ model League {
   marketsPerSession Int    @default(5)
   category        String?  // Market category filter (Sports, Politics, Crypto, etc.)
   draftOrder      String[] @default([]) // Array of player addresses in draft order
+  leagueType      String   @default("STANDARD") // STANDARD or ONE_ON_ONE
   createdAt       DateTime @default(now())
   
   players         PlayerStats[]
   draftPicks      DraftPick[]
   sessions        LeagueSession[]
+}
+
+model UserProfile {
+  id        Int      @id @default(autoincrement())
+  address   String   @unique // Wallet pubkey
+  elo       Int      @default(1000)
+  wins      Int      @default(0)
+  losses    Int      @default(0)
+  createdAt DateTime @default(now())
 }
 
 model PlayerStats {

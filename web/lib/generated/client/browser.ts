@@ -23,6 +23,11 @@ export * from './enums.ts';
  */
 export type League = Prisma.LeagueModel
 /**
+ * Model UserProfile
+ * 
+ */
+export type UserProfile = Prisma.UserProfileModel
+/**
  * Model PlayerStats
  * 
  */

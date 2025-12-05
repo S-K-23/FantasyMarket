@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   League: 'League',
+  UserProfile: 'UserProfile',
   PlayerStats: 'PlayerStats',
   Market: 'Market',
   DraftPick: 'DraftPick',
@@ -89,10 +90,23 @@ export const LeagueScalarFieldEnum = {
   marketsPerSession: 'marketsPerSession',
   category: 'category',
   draftOrder: 'draftOrder',
+  leagueType: 'leagueType',
   createdAt: 'createdAt'
 } as const
 
 export type LeagueScalarFieldEnum = (typeof LeagueScalarFieldEnum)[keyof typeof LeagueScalarFieldEnum]
+
+
+export const UserProfileScalarFieldEnum = {
+  id: 'id',
+  address: 'address',
+  elo: 'elo',
+  wins: 'wins',
+  losses: 'losses',
+  createdAt: 'createdAt'
+} as const
+
+export type UserProfileScalarFieldEnum = (typeof UserProfileScalarFieldEnum)[keyof typeof UserProfileScalarFieldEnum]
 
 
 export const PlayerStatsScalarFieldEnum = {
