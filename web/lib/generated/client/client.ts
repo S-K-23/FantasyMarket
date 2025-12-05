@@ -59,3 +59,8 @@ export type Market = Prisma.MarketModel
  * 
  */
 export type DraftPick = Prisma.DraftPickModel
+/**
+ * Model LeagueSession
+ * 
+ */
+export type LeagueSession = Prisma.LeagueSessionModel

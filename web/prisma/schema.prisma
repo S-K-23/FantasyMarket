@@ -26,6 +26,7 @@ model League {
   
   players         PlayerStats[]
   draftPicks      DraftPick[]
+  sessions        LeagueSession[]
 }
 
 model PlayerStats {
@@ -36,6 +37,7 @@ model PlayerStats {
   points    Float   @default(0)
   streak    Int     @default(0)
   rank      Int?
+  bonuses   Json?   // Store bonus breakdown { longshot: 0, streak: 0, cleanSweep: 0 }
   
   @@unique([leagueId, address])
 }
@@ -81,18 +83,15 @@ model DraftPick {
   
   @@unique([leagueId, marketId, prediction])
 }
-model Trade {
-  id            String   @id @default(uuid())
-  tradeId       String   // On-chain Trade ID (u64 as string)
-  leagueId      Int
-  league        League   @relation(fields: [leagueId], references: [id])
-  proposer      String   // Pubkey
-  receiver      String   // Pubkey
-  proposerPick  Int      // DraftPick ID (DB ID)
-  receiverPick  Int      // DraftPick ID (DB ID)
-  status        String   // PENDING, ACCEPTED, REJECTED, EXPIRED, CANCELED
-  createdAt     DateTime @default(now())
-  expiresAt     DateTime
+
+model LeagueSession {
+  id        Int      @id @default(autoincrement())
+  leagueId  Int
+  league    League   @relation(fields: [leagueId], references: [id])
+  session   Int      // 1, 2, 3...
+  status    String   // PENDING, DRAFTING, ACTIVE, COMPLETED
+  startTime DateTime?
+  endTime   DateTime? // Deadline for drafting
   
-  @@unique([leagueId, tradeId])
+  @@unique([leagueId, session])
 }

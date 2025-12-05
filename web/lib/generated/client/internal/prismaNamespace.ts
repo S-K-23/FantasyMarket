@@ -387,7 +387,8 @@ export const ModelName = {
   League: 'League',
   PlayerStats: 'PlayerStats',
   Market: 'Market',
-  DraftPick: 'DraftPick'
+  DraftPick: 'DraftPick',
+  LeagueSession: 'LeagueSession'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -403,7 +404,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "league" | "playerStats" | "market" | "draftPick"
+    modelProps: "league" | "playerStats" | "market" | "draftPick" | "leagueSession"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -703,6 +704,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LeagueSession: {
+      payload: Prisma.$LeagueSessionPayload<ExtArgs>
+      fields: Prisma.LeagueSessionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LeagueSessionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueSessionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LeagueSessionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueSessionPayload>
+        }
+        findFirst: {
+          args: Prisma.LeagueSessionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueSessionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LeagueSessionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueSessionPayload>
+        }
+        findMany: {
+          args: Prisma.LeagueSessionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueSessionPayload>[]
+        }
+        create: {
+          args: Prisma.LeagueSessionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueSessionPayload>
+        }
+        createMany: {
+          args: Prisma.LeagueSessionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LeagueSessionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueSessionPayload>[]
+        }
+        delete: {
+          args: Prisma.LeagueSessionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueSessionPayload>
+        }
+        update: {
+          args: Prisma.LeagueSessionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueSessionPayload>
+        }
+        deleteMany: {
+          args: Prisma.LeagueSessionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LeagueSessionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LeagueSessionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueSessionPayload>[]
+        }
+        upsert: {
+          args: Prisma.LeagueSessionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueSessionPayload>
+        }
+        aggregate: {
+          args: Prisma.LeagueSessionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLeagueSession>
+        }
+        groupBy: {
+          args: Prisma.LeagueSessionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LeagueSessionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LeagueSessionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LeagueSessionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -769,7 +844,8 @@ export const PlayerStatsScalarFieldEnum = {
   address: 'address',
   points: 'points',
   streak: 'streak',
-  rank: 'rank'
+  rank: 'rank',
+  bonuses: 'bonuses'
 } as const
 
 export type PlayerStatsScalarFieldEnum = (typeof PlayerStatsScalarFieldEnum)[keyof typeof PlayerStatsScalarFieldEnum]
@@ -815,12 +891,32 @@ export const DraftPickScalarFieldEnum = {
 export type DraftPickScalarFieldEnum = (typeof DraftPickScalarFieldEnum)[keyof typeof DraftPickScalarFieldEnum]
 
 
+export const LeagueSessionScalarFieldEnum = {
+  id: 'id',
+  leagueId: 'leagueId',
+  session: 'session',
+  status: 'status',
+  startTime: 'startTime',
+  endTime: 'endTime'
+} as const
+
+export type LeagueSessionScalarFieldEnum = (typeof LeagueSessionScalarFieldEnum)[keyof typeof LeagueSessionScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -837,6 +933,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -898,6 +1003,20 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -1020,6 +1139,7 @@ export type GlobalOmitConfig = {
   playerStats?: Prisma.PlayerStatsOmit
   market?: Prisma.MarketOmit
   draftPick?: Prisma.DraftPickOmit
+  leagueSession?: Prisma.LeagueSessionOmit
 }
 
 /* Types for Logging */

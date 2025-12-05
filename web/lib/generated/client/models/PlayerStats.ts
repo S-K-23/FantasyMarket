@@ -67,6 +67,7 @@ export type PlayerStatsCountAggregateOutputType = {
   points: number
   streak: number
   rank: number
+  bonuses: number
   _all: number
 }
 
@@ -112,6 +113,7 @@ export type PlayerStatsCountAggregateInputType = {
   points?: true
   streak?: true
   rank?: true
+  bonuses?: true
   _all?: true
 }
 
@@ -208,6 +210,7 @@ export type PlayerStatsGroupByOutputType = {
   points: number
   streak: number
   rank: number | null
+  bonuses: runtime.JsonValue | null
   _count: PlayerStatsCountAggregateOutputType | null
   _avg: PlayerStatsAvgAggregateOutputType | null
   _sum: PlayerStatsSumAggregateOutputType | null
@@ -240,6 +243,7 @@ export type PlayerStatsWhereInput = {
   points?: Prisma.FloatFilter<"PlayerStats"> | number
   streak?: Prisma.IntFilter<"PlayerStats"> | number
   rank?: Prisma.IntNullableFilter<"PlayerStats"> | number | null
+  bonuses?: Prisma.JsonNullableFilter<"PlayerStats">
   league?: Prisma.XOR<Prisma.LeagueScalarRelationFilter, Prisma.LeagueWhereInput>
 }
 
@@ -250,6 +254,7 @@ export type PlayerStatsOrderByWithRelationInput = {
   points?: Prisma.SortOrder
   streak?: Prisma.SortOrder
   rank?: Prisma.SortOrderInput | Prisma.SortOrder
+  bonuses?: Prisma.SortOrderInput | Prisma.SortOrder
   league?: Prisma.LeagueOrderByWithRelationInput
 }
 
@@ -264,6 +269,7 @@ export type PlayerStatsWhereUniqueInput = Prisma.AtLeast<{
   points?: Prisma.FloatFilter<"PlayerStats"> | number
   streak?: Prisma.IntFilter<"PlayerStats"> | number
   rank?: Prisma.IntNullableFilter<"PlayerStats"> | number | null
+  bonuses?: Prisma.JsonNullableFilter<"PlayerStats">
   league?: Prisma.XOR<Prisma.LeagueScalarRelationFilter, Prisma.LeagueWhereInput>
 }, "id" | "leagueId_address">
 
@@ -274,6 +280,7 @@ export type PlayerStatsOrderByWithAggregationInput = {
   points?: Prisma.SortOrder
   streak?: Prisma.SortOrder
   rank?: Prisma.SortOrderInput | Prisma.SortOrder
+  bonuses?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PlayerStatsCountOrderByAggregateInput
   _avg?: Prisma.PlayerStatsAvgOrderByAggregateInput
   _max?: Prisma.PlayerStatsMaxOrderByAggregateInput
@@ -291,6 +298,7 @@ export type PlayerStatsScalarWhereWithAggregatesInput = {
   points?: Prisma.FloatWithAggregatesFilter<"PlayerStats"> | number
   streak?: Prisma.IntWithAggregatesFilter<"PlayerStats"> | number
   rank?: Prisma.IntNullableWithAggregatesFilter<"PlayerStats"> | number | null
+  bonuses?: Prisma.JsonNullableWithAggregatesFilter<"PlayerStats">
 }
 
 export type PlayerStatsCreateInput = {
@@ -298,6 +306,7 @@ export type PlayerStatsCreateInput = {
   points?: number
   streak?: number
   rank?: number | null
+  bonuses?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   league: Prisma.LeagueCreateNestedOneWithoutPlayersInput
 }
 
@@ -308,6 +317,7 @@ export type PlayerStatsUncheckedCreateInput = {
   points?: number
   streak?: number
   rank?: number | null
+  bonuses?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PlayerStatsUpdateInput = {
@@ -315,6 +325,7 @@ export type PlayerStatsUpdateInput = {
   points?: Prisma.FloatFieldUpdateOperationsInput | number
   streak?: Prisma.IntFieldUpdateOperationsInput | number
   rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  bonuses?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   league?: Prisma.LeagueUpdateOneRequiredWithoutPlayersNestedInput
 }
 
@@ -325,6 +336,7 @@ export type PlayerStatsUncheckedUpdateInput = {
   points?: Prisma.FloatFieldUpdateOperationsInput | number
   streak?: Prisma.IntFieldUpdateOperationsInput | number
   rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  bonuses?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PlayerStatsCreateManyInput = {
@@ -334,6 +346,7 @@ export type PlayerStatsCreateManyInput = {
   points?: number
   streak?: number
   rank?: number | null
+  bonuses?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PlayerStatsUpdateManyMutationInput = {
@@ -341,6 +354,7 @@ export type PlayerStatsUpdateManyMutationInput = {
   points?: Prisma.FloatFieldUpdateOperationsInput | number
   streak?: Prisma.IntFieldUpdateOperationsInput | number
   rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  bonuses?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PlayerStatsUncheckedUpdateManyInput = {
@@ -350,6 +364,7 @@ export type PlayerStatsUncheckedUpdateManyInput = {
   points?: Prisma.FloatFieldUpdateOperationsInput | number
   streak?: Prisma.IntFieldUpdateOperationsInput | number
   rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  bonuses?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PlayerStatsListRelationFilter = {
@@ -374,6 +389,7 @@ export type PlayerStatsCountOrderByAggregateInput = {
   points?: Prisma.SortOrder
   streak?: Prisma.SortOrder
   rank?: Prisma.SortOrder
+  bonuses?: Prisma.SortOrder
 }
 
 export type PlayerStatsAvgOrderByAggregateInput = {
@@ -465,6 +481,7 @@ export type PlayerStatsCreateWithoutLeagueInput = {
   points?: number
   streak?: number
   rank?: number | null
+  bonuses?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PlayerStatsUncheckedCreateWithoutLeagueInput = {
@@ -473,6 +490,7 @@ export type PlayerStatsUncheckedCreateWithoutLeagueInput = {
   points?: number
   streak?: number
   rank?: number | null
+  bonuses?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PlayerStatsCreateOrConnectWithoutLeagueInput = {
@@ -511,6 +529,7 @@ export type PlayerStatsScalarWhereInput = {
   points?: Prisma.FloatFilter<"PlayerStats"> | number
   streak?: Prisma.IntFilter<"PlayerStats"> | number
   rank?: Prisma.IntNullableFilter<"PlayerStats"> | number | null
+  bonuses?: Prisma.JsonNullableFilter<"PlayerStats">
 }
 
 export type PlayerStatsCreateManyLeagueInput = {
@@ -519,6 +538,7 @@ export type PlayerStatsCreateManyLeagueInput = {
   points?: number
   streak?: number
   rank?: number | null
+  bonuses?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PlayerStatsUpdateWithoutLeagueInput = {
@@ -526,6 +546,7 @@ export type PlayerStatsUpdateWithoutLeagueInput = {
   points?: Prisma.FloatFieldUpdateOperationsInput | number
   streak?: Prisma.IntFieldUpdateOperationsInput | number
   rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  bonuses?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PlayerStatsUncheckedUpdateWithoutLeagueInput = {
@@ -534,6 +555,7 @@ export type PlayerStatsUncheckedUpdateWithoutLeagueInput = {
   points?: Prisma.FloatFieldUpdateOperationsInput | number
   streak?: Prisma.IntFieldUpdateOperationsInput | number
   rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  bonuses?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PlayerStatsUncheckedUpdateManyWithoutLeagueInput = {
@@ -542,6 +564,7 @@ export type PlayerStatsUncheckedUpdateManyWithoutLeagueInput = {
   points?: Prisma.FloatFieldUpdateOperationsInput | number
   streak?: Prisma.IntFieldUpdateOperationsInput | number
   rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  bonuses?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 
@@ -553,6 +576,7 @@ export type PlayerStatsSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   points?: boolean
   streak?: boolean
   rank?: boolean
+  bonuses?: boolean
   league?: boolean | Prisma.LeagueDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["playerStats"]>
 
@@ -563,6 +587,7 @@ export type PlayerStatsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   points?: boolean
   streak?: boolean
   rank?: boolean
+  bonuses?: boolean
   league?: boolean | Prisma.LeagueDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["playerStats"]>
 
@@ -573,6 +598,7 @@ export type PlayerStatsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   points?: boolean
   streak?: boolean
   rank?: boolean
+  bonuses?: boolean
   league?: boolean | Prisma.LeagueDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["playerStats"]>
 
@@ -583,9 +609,10 @@ export type PlayerStatsSelectScalar = {
   points?: boolean
   streak?: boolean
   rank?: boolean
+  bonuses?: boolean
 }
 
-export type PlayerStatsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "leagueId" | "address" | "points" | "streak" | "rank", ExtArgs["result"]["playerStats"]>
+export type PlayerStatsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "leagueId" | "address" | "points" | "streak" | "rank" | "bonuses", ExtArgs["result"]["playerStats"]>
 export type PlayerStatsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   league?: boolean | Prisma.LeagueDefaultArgs<ExtArgs>
 }
@@ -608,6 +635,7 @@ export type $PlayerStatsPayload<ExtArgs extends runtime.Types.Extensions.Interna
     points: number
     streak: number
     rank: number | null
+    bonuses: runtime.JsonValue | null
   }, ExtArgs["result"]["playerStats"]>
   composites: {}
 }
@@ -1038,6 +1066,7 @@ export interface PlayerStatsFieldRefs {
   readonly points: Prisma.FieldRef<"PlayerStats", 'Float'>
   readonly streak: Prisma.FieldRef<"PlayerStats", 'Int'>
   readonly rank: Prisma.FieldRef<"PlayerStats", 'Int'>
+  readonly bonuses: Prisma.FieldRef<"PlayerStats", 'Json'>
 }
     
 

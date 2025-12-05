@@ -122,9 +122,15 @@ export default function LeagueAdminPage() {
             <div className="max-w-4xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold">👮‍♂️ Commissioner Tools</h1>
-                    <Link href={`/league/${params.id}/lobby`} className="text-blue-400 hover:underline">
-                        Back to Lobby
-                    </Link>
+                    <div className="flex items-center gap-4">
+                        <Link href="/" className="text-blue-400 hover:underline">
+                            🏠 Home
+                        </Link>
+                        <span className="text-gray-600">|</span>
+                        <Link href={`/league/${params.id}/lobby`} className="text-blue-400 hover:underline">
+                            Back to Lobby
+                        </Link>
+                    </div>
                 </div>
 
                 <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">

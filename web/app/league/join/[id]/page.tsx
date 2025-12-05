@@ -194,7 +194,9 @@ export default function JoinLeaguePage() {
                 )}
 
                 <div className="mt-4 text-center">
-                    <Link href="/" className="text-sm text-muted-foreground hover:underline">Cancel</Link>
+                    <Link href="/" className="text-sm text-muted-foreground hover:underline flex items-center justify-center gap-2">
+                        🏠 Back to Home
+                    </Link>
                 </div>
             </div>
         </div>
