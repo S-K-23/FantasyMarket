@@ -278,9 +278,15 @@ export default function DraftPage() {
             {/* Header */}
             <nav className="border-b border-gray-700 bg-gray-900/50 backdrop-blur">
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-                    <Link href={`/league/${params.id}/lobby`} className="text-xl font-bold hover:text-blue-400">
-                        ← Back to Lobby
-                    </Link>
+                    <div className="flex items-center gap-4">
+                        <Link href="/" className="text-xl font-bold hover:text-blue-400">
+                            🏠 Home
+                        </Link>
+                        <span className="text-gray-600">|</span>
+                        <Link href={`/league/${params.id}/lobby`} className="text-xl font-bold hover:text-blue-400">
+                            ← Back to Lobby
+                        </Link>
+                    </div>
                     <div className="flex items-center gap-4">
                         <span className="text-xs text-green-400">● Live Polymarket Odds</span>
                         {league.category && (
