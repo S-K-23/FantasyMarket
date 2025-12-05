@@ -69,6 +69,8 @@ export async function POST(request: Request) {
                 currency: body.currency,
                 maxPlayers: parseInt(body.maxPlayers),
                 totalSessions: parseInt(body.totalSessions),
+                marketsPerSession: body.marketsPerSession ? parseInt(body.marketsPerSession) : 5,
+                category: body.category || null,
                 status: 'SETUP',
             }
         });
